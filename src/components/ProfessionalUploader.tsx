@@ -16,7 +16,13 @@ const AVAILABLE_FIELDS = [
   'snr',
 ];
 
-export const ProfessionalUploader = ({ endpoint = '/analyze' }: { endpoint?: string }) => {
+export const ProfessionalUploader = ({ 
+  endpoint = '/analyze', 
+  onDataUploaded 
+}: { 
+  endpoint?: string;
+  onDataUploaded?: () => void;
+}) => {
   const [file, setFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<string[][] | null>(null);
   const [mappings, setMappings] = useState<CSVMapping[]>([]);
@@ -63,6 +69,7 @@ export const ProfessionalUploader = ({ endpoint = '/analyze' }: { endpoint?: str
       });
 
       setPlanets(response.data.planets || []);
+      onDataUploaded?.();
       toast({
         title: 'Analysis Complete',
         description: `Detected ${response.data.planets?.length || 0} exoplanet candidates.`,

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Info } from 'lucide-react';
+import { CheckCircle, XCircle, Info, Upload, FileText, BarChart3 } from 'lucide-react';
 import { usePlanetsStore } from '@/hooks/usePlanetsStore';
 import { PlanetData } from '@/types/exoplanet';
 import { ProfessionalUploader } from './ProfessionalUploader';
+import { Professional3DVisualization } from './Professional3DVisualization';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Mock data simulado
 const MOCK_EXOPLANETS: PlanetData[] = [
@@ -19,147 +21,233 @@ const MOCK_EXOPLANETS: PlanetData[] = [
 
 export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string }) => {
   const { planets, setPlanets } = usePlanetsStore();
+  const isMobile = useIsMobile();
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetData | null>(null);
+  const [hasUploadedData, setHasUploadedData] = useState(false);
 
-  // Inicializar con datos mock si no hay planetas
+  // Show mock data only after upload simulation or if data exists
   useEffect(() => {
-    if (planets.length === 0) {
+    if (planets.length === 0 && hasUploadedData) {
       setPlanets(MOCK_EXOPLANETS);
     }
-  }, [planets.length, setPlanets]);
+  }, [planets.length, setPlanets, hasUploadedData]);
 
-  const displayPlanets = planets.length > 0 ? planets : MOCK_EXOPLANETS;
+  const displayPlanets = planets.length > 0 ? planets : [];
+  const showData = displayPlanets.length > 0;
 
   return (
-    <div className="pt-20 min-h-screen bg-background relative">
+    <div className="h-screen bg-background relative overflow-hidden">
       {/* Uploader panel */}
-      <ProfessionalUploader endpoint={endpoint} />
+      <motion.div
+        initial={{ opacity: 0, x: isMobile ? 0 : -300, y: isMobile ? -300 : 0 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        className={`fixed ${
+          isMobile 
+            ? 'left-2 right-2 top-2 h-auto max-h-[40vh]' 
+            : 'left-4 top-4 bottom-4 w-96'
+        } glass-panel overflow-hidden z-40 touch-manipulation`}
+      >
+        <ProfessionalUploader 
+          endpoint={endpoint} 
+          onDataUploaded={() => setHasUploadedData(true)}
+        />
+      </motion.div>
 
-      {/* Main content - Split view */}
-      <div className="ml-[416px] h-screen flex">
-        {/* Left side - Data table (70%) */}
-        <div className="w-[70%] p-6 overflow-y-auto">
+      {!showData ? (
+        /* No data state - Upload prompt */
+        <div className="ml-[416px] h-full flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
+            className="text-center max-w-md"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <Info className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">
-                Análisis de Candidatos a Exoplanetas
+            <div className="mb-8">
+              <Upload className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                Modo Profesional
               </h2>
+              <p className="text-muted-foreground">
+                Sube un archivo CSV para comenzar el análisis de candidatos a exoplanetas
+              </p>
             </div>
-
-            {/* Table */}
-            <div className="glass-panel rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-primary/10 border-b border-border">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Nombre</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Probabilidad</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Radio (R⊕)</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Período (días)</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-foreground">Resultado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayPlanets.map((planet, index) => {
-                    const isExoplanet = planet.isExoplanet ?? (planet.probability ?? 0) > 0.5;
-                    return (
-                      <motion.tr
-                        key={planet.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className={`border-b border-border hover:bg-accent/50 cursor-pointer transition-colors ${
-                          selectedPlanet?.id === planet.id ? 'bg-accent/30' : ''
-                        }`}
-                        onClick={() => setSelectedPlanet(planet)}
-                      >
-                        <td className="px-6 py-4 text-sm font-medium text-foreground">
-                          {planet.name || planet.id}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">
-                          {((planet.probability ?? 0.5) * 100).toFixed(0)}%
-                        </td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">
-                          {planet.features.radius.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">
-                          {planet.features.period.toFixed(0)}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          {isExoplanet ? (
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
-                              <CheckCircle className="h-4 w-4" />
-                              <span className="text-xs font-semibold">Exoplaneta</span>
-                            </div>
-                          ) : (
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">
-                              <XCircle className="h-4 w-4" />
-                              <span className="text-xs font-semibold">Falso Positivo</span>
-                            </div>
-                          )}
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Right side - 3D Visualization (30%) */}
-        <div className="w-[30%] p-6 border-l border-border">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="h-full flex flex-col"
-          >
-            <h3 className="text-lg font-bold text-foreground mb-4">Visualización 3D</h3>
             
-            {selectedPlanet ? (
-              <div className="flex-1 flex flex-col items-center justify-center glass-panel rounded-lg p-6">
-                {/* Animated planet visualization */}
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-                  className={`w-32 h-32 rounded-full mb-6 ${
-                    (selectedPlanet.isExoplanet ?? (selectedPlanet.probability ?? 0) > 0.5)
-                      ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/50'
-                      : 'bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/50'
-                  }`}
-                >
-                  <div className="w-full h-full rounded-full bg-gradient-to-tr from-white/20 to-transparent" />
-                </motion.div>
-
-                {/* Planet info */}
-                <div className="text-center space-y-2">
-                  <h4 className="text-xl font-bold text-foreground">
-                    {selectedPlanet.name || selectedPlanet.id}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Probabilidad: {((selectedPlanet.probability ?? 0.5) * 100).toFixed(0)}%
-                  </p>
-                  <div className="pt-4 space-y-1 text-xs text-muted-foreground">
-                    <p>Radio: {selectedPlanet.features.radius.toFixed(2)} R⊕</p>
-                    <p>Período: {selectedPlanet.features.period.toFixed(0)} días</p>
-                    <p>Distancia: {selectedPlanet.features.distance.toFixed(1)} AU</p>
-                  </div>
+            <div className="space-y-4">
+              <div className="glass-panel p-4 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <span className="font-semibold">Formato CSV</span>
                 </div>
-              </div>
-            ) : (
-              <div className="flex-1 flex items-center justify-center glass-panel rounded-lg p-6">
-                <p className="text-center text-muted-foreground">
-                  Selecciona un planeta de la tabla para ver su visualización
+                <p className="text-sm text-muted-foreground text-left">
+                  El archivo debe contener columnas para: nombre, radio, período, distancia, y probabilidad
                 </p>
               </div>
-            )}
+              
+              <div className="glass-panel p-4 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                  <span className="font-semibold">Análisis Avanzado</span>
+                </div>
+                <p className="text-sm text-muted-foreground text-left">
+                  Visualización 3D realista, clasificación automática, y métricas detalladas
+                </p>
+              </div>
+            </div>
           </motion.div>
         </div>
-      </div>
+      ) : (
+        /* Data view - Responsive layout */
+        <div className={`${isMobile ? 'pt-[45vh] px-2' : 'ml-[416px]'} h-full ${isMobile ? 'block' : 'flex'}`}>
+          {/* Data table section */}
+          <div className={`${isMobile ? 'w-full mb-4' : 'w-[60%]'} ${isMobile ? 'p-3' : 'p-6'} overflow-y-auto`}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                <h2 className="text-2xl font-bold text-foreground">
+                  Análisis de Candidatos a Exoplanetas
+                </h2>
+                <div className="ml-auto text-sm text-muted-foreground">
+                  {displayPlanets.length} candidatos analizados
+                </div>
+              </div>
+
+              {/* Statistics cards */}
+              <div className={`grid ${isMobile ? 'grid-cols-1 gap-2 mb-4' : 'grid-cols-3 gap-4 mb-6'}`}>
+                <div className="glass-panel p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-green-400">
+                    {displayPlanets.filter(p => (p.isExoplanet ?? (p.probability ?? 0) > 0.5)).length}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Exoplanetas</div>
+                </div>
+                <div className="glass-panel p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-red-400">
+                    {displayPlanets.filter(p => !(p.isExoplanet ?? (p.probability ?? 0) > 0.5)).length}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Falsos Positivos</div>
+                </div>
+                <div className="glass-panel p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">
+                    {Math.round(displayPlanets.reduce((acc, p) => acc + (p.probability ?? 0.5), 0) / displayPlanets.length * 100)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">Confianza Promedio</div>
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="glass-panel rounded-lg overflow-hidden">
+                <div className={`${isMobile ? 'overflow-x-auto' : ''}`}>
+                  <table className={`w-full ${isMobile ? 'min-w-[600px]' : ''}`}>
+                    <thead className="bg-primary/10 border-b border-border">
+                      <tr>
+                        <th className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-left font-semibold text-foreground`}>Nombre</th>
+                        <th className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-left font-semibold text-foreground`}>Probabilidad</th>
+                        <th className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-left font-semibold text-foreground`}>Radio (R⊕)</th>
+                        <th className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-left font-semibold text-foreground`}>Período (días)</th>
+                        <th className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-center font-semibold text-foreground`}>Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {displayPlanets.map((planet, index) => {
+                      const isExoplanet = planet.isExoplanet ?? (planet.probability ?? 0) > 0.5;
+                      return (
+                        <motion.tr
+                          key={planet.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className={`border-b border-border/50 hover:bg-muted/30 cursor-pointer transition-colors touch-manipulation ${
+                            selectedPlanet?.id === planet.id ? 'bg-primary/10' : ''
+                          }`}
+                          onClick={() => setSelectedPlanet(planet)}
+                        >
+                          <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} font-medium text-foreground`}>
+                            {planet.name || `Candidato ${index + 1}`}
+                          </td>
+                          <td className={`${isMobile ? 'px-2 py-2' : 'px-4 py-3'}`}>
+                            <div className="flex items-center gap-2">
+                              <div className={`${isMobile ? 'w-12 h-1.5' : 'w-16 h-2'} bg-muted rounded-full overflow-hidden`}>
+                                <div 
+                                  className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 transition-all duration-300"
+                                  style={{ width: `${(planet.probability ?? 0.5) * 100}%` }}
+                                />
+                              </div>
+                              <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-foreground`}>
+                                {((planet.probability ?? 0.5) * 100).toFixed(1)}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-muted-foreground`}>
+                            {planet.features.radius.toFixed(2)}
+                          </td>
+                          <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-muted-foreground`}>
+                            {planet.features.period.toFixed(1)}
+                          </td>
+                          <td className={`${isMobile ? 'px-2 py-2' : 'px-4 py-3'} text-center`}>
+                            {isExoplanet ? (
+                              <div className="flex items-center justify-center gap-1">
+                                <CheckCircle className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-green-500`} />
+                                <span className={`${isMobile ? 'text-xs' : 'text-xs'} font-medium text-green-500`}>
+                                  {isMobile ? 'Exo' : 'Exoplaneta'}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center gap-1">
+                                <XCircle className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-red-500`} />
+                                <span className={`${isMobile ? 'text-xs' : 'text-xs'} font-medium text-red-500`}>
+                                  {isMobile ? 'Falso' : 'Falso Positivo'}
+                                </span>
+                              </div>
+                            )}
+                          </td>
+                        </motion.tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            </motion.div>
+          </div>
+
+          {/* Right side - 3D Visualization (40%) */}
+          <div className={`${isMobile ? 'w-full mt-4' : 'w-[40%]'} ${isMobile ? '' : 'border-l border-border'}`}>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="h-full flex flex-col"
+            >
+              <div className={`${isMobile ? 'p-3' : 'p-4'} border-b border-border`}>
+                <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-foreground`}>Visualización 3D</h3>
+                {selectedPlanet && (
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                    {selectedPlanet.name || selectedPlanet.id}
+                  </p>
+                )}
+              </div>
+              
+              <div className="flex-1">
+                {selectedPlanet ? (
+                  <div className={`${isMobile ? 'h-48' : 'h-full'}`}>
+                    <Professional3DVisualization planetData={selectedPlanet} />
+                  </div>
+                ) : (
+                  <div className={`h-full flex items-center justify-center ${isMobile ? 'p-4' : 'p-6'}`}>
+                    <div className="text-center">
+                      <Info className={`${isMobile ? 'h-8 w-8' : 'h-12 w-12'} text-muted-foreground mx-auto mb-4`} />
+                      <p className={`text-muted-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
+                        {isMobile ? 'Selecciona un candidato' : 'Selecciona un candidato de la tabla para ver su visualización 3D'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

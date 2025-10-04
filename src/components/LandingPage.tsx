@@ -1,48 +1,35 @@
 import { motion } from 'framer-motion';
-import { FlaskConical, Telescope, Rocket } from 'lucide-react';
+import { FlaskConical, Telescope, Rocket, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AnimatedStarField } from './AnimatedStarField';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LandingPageProps {
   onSelectMode: (mode: 'didactic' | 'professional') => void;
 }
 
 export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-950 via-purple-950 to-black">
-      {/* Animated background stars */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: [0.2, 1, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: Math.random() * 3 + 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
+      {/* Enhanced animated star field background */}
+      <AnimatedStarField />
+      
+      {/* Additional atmospheric overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
 
       {/* Main content */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      <div className={`relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto ${isMobile ? 'py-8' : ''}`}>
         {/* Logo icon */}
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ duration: 0.8, type: 'spring' }}
-          className="flex justify-center mb-8"
+          className={`flex justify-center ${isMobile ? 'mb-6' : 'mb-8'}`}
         >
-          <div className="p-6 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-            <Rocket className="h-16 w-16 text-cyan-400" />
+          <div className={`${isMobile ? 'p-4' : 'p-6'} bg-white/10 backdrop-blur-sm rounded-full border border-white/20`}>
+            <Rocket className={`${isMobile ? 'h-12 w-12' : 'h-16 w-16'} text-cyan-400`} />
           </div>
         </motion.div>
 
@@ -51,9 +38,9 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="mb-6"
+          className={`${isMobile ? 'mb-4' : 'mb-6'}`}
         >
-          <h1 className="text-6xl md:text-7xl font-bold text-white mb-2">
+          <h1 className={`${isMobile ? 'text-4xl' : 'text-6xl md:text-7xl'} font-bold text-white mb-2`}>
             ExoPlanet{' '}
             <motion.span
               initial={{ opacity: 0 }}
@@ -71,48 +58,78 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.8 }}
-          className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto"
+          className={`${isMobile ? 'text-lg mb-8' : 'text-xl md:text-2xl mb-12'} text-gray-300 max-w-3xl mx-auto`}
         >
           Explora cómo la NASA detecta exoplanetas con datos reales e IA
         </motion.p>
 
-        {/* Buttons */}
+        {/* Enhanced Buttons Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.3, duration: 0.8 }}
-          className="flex flex-col md:flex-row gap-6 justify-center items-center"
+          className={`flex flex-col ${isMobile ? 'gap-4' : 'lg:flex-row gap-8'} justify-center items-center mt-8`}
         >
           {/* Didactic Button */}
-          <Button
-            onClick={() => onSelectMode('didactic')}
-            className="group relative overflow-hidden bg-blue-600 hover:bg-blue-500 text-white px-8 py-6 text-lg font-semibold rounded-xl shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 hover:shadow-blue-400/70 min-w-[250px]"
+          <motion.div
+            whileHover={!isMobile ? { scale: 1.05, y: -5 } : {}}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <FlaskConical className="h-6 w-6 mr-3" />
-            <span>🌍 Didactic Mode</span>
-            <motion.div
-              className="absolute inset-0 bg-white"
-              initial={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 2, opacity: 0.1 }}
-              transition={{ duration: 0.5 }}
-            />
-          </Button>
+            <Button
+              onClick={() => onSelectMode('didactic')}
+              size={isMobile ? "default" : "lg"}
+              className={`group relative overflow-hidden bg-gradient-to-br from-cyan-500 via-blue-500 to-blue-600 hover:from-cyan-400 hover:via-blue-400 hover:to-blue-500 text-white font-bold ${isMobile ? 'px-6 py-4 w-full max-w-sm' : 'px-10 py-6'} rounded-2xl shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 border border-cyan-400/20 touch-manipulation`}
+            >
+              <div className={`flex items-center ${isMobile ? 'gap-3' : 'gap-4'}`}>
+                <div className="p-2 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors duration-300">
+                  <FlaskConical className={`${isMobile ? 'h-5 w-5' : 'h-7 w-7'} group-hover:rotate-12 transition-transform duration-300`} />
+                </div>
+                <div className="text-left">
+                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>Modo Didáctico</div>
+                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} opacity-90 font-medium`}>Aprende sobre exoplanetas</div>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12" />
+              <Sparkles className="absolute top-2 right-2 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </Button>
+          </motion.div>
 
           {/* Professional Button */}
-          <Button
-            onClick={() => onSelectMode('professional')}
-            className="group relative overflow-hidden bg-green-600 hover:bg-green-500 text-white px-8 py-6 text-lg font-semibold rounded-xl shadow-lg shadow-green-500/50 transition-all duration-300 hover:scale-105 hover:shadow-green-400/70 min-w-[250px]"
+          <motion.div
+            whileHover={!isMobile ? { scale: 1.05, y: -5 } : {}}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Telescope className="h-6 w-6 mr-3" />
-            <span>🔬 Professional Mode</span>
-            <motion.div
-              className="absolute inset-0 bg-white"
-              initial={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 2, opacity: 0.1 }}
-              transition={{ duration: 0.5 }}
-            />
-          </Button>
+            <Button
+              onClick={() => onSelectMode('professional')}
+              size={isMobile ? "default" : "lg"}
+              className={`group relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 hover:from-purple-400 hover:via-pink-400 hover:to-rose-500 text-white font-bold ${isMobile ? 'px-6 py-4 w-full max-w-sm' : 'px-10 py-6'} rounded-2xl shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 border border-purple-400/20 touch-manipulation`}
+            >
+              <div className={`flex items-center ${isMobile ? 'gap-3' : 'gap-4'}`}>
+                <div className="p-2 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors duration-300">
+                  <Telescope className={`${isMobile ? 'h-5 w-5' : 'h-7 w-7'} group-hover:rotate-12 transition-transform duration-300`} />
+                </div>
+                <div className="text-left">
+                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>Modo Profesional</div>
+                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} opacity-90 font-medium`}>Análisis con IA</div>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12" />
+              <Sparkles className="absolute top-2 right-2 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </Button>
+          </motion.div>
         </motion.div>
+
+        {/* Additional info text */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.8, duration: 0.8 }}
+          className="text-gray-400 text-center mt-8 max-w-2xl mx-auto"
+        >
+          Descubre cómo los científicos detectan mundos distantes usando datos reales de misiones espaciales como Kepler y TESS
+        </motion.p>
 
         {/* Info text */}
         <motion.div
