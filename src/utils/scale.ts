@@ -1,8 +1,8 @@
 // Scaling constants for the 3D scene
-export const SCALE_RADIUS = 0.3; // Planet visual size multiplier
-export const SCALE_DISTANCE = 2.5; // Orbital distance multiplier
-export const SCALE_PERIOD = 0.05; // Orbital speed factor (smaller = faster)
-export const STAR_RADIUS = 1.5; // Star size
+export const SCALE_RADIUS = 0.2; // Planet visual size multiplier
+export const SCALE_DISTANCE = 1.5; // Orbital distance multiplier
+export const SCALE_PERIOD = 1.0; // Orbital speed factor (larger = slower)
+export const STAR_RADIUS = 1.0; // Star size
 
 // Convert features to scene values
 export const scaleRadius = (radius: number): number => {
