@@ -1,7 +1,7 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { Mesh, Group } from 'three';
 import { useFrame, ThreeEvent } from '@react-three/fiber';
-import { Line } from '@react-three/drei';
+import { Line, Html } from '@react-three/drei';
 import { PlanetData } from '@/types/exoplanet';
 import {
   scaleRadius,
@@ -19,7 +19,8 @@ interface PlanetProps {
 export const Planet = ({ planet }: PlanetProps) => {
   const groupRef = useRef<Group>(null);
   const meshRef = useRef<Mesh>(null);
-  const { setHoveredPlanet, selectPlanet } = usePlanetsStore();
+  const { setHoveredPlanet, selectPlanet, hoveredPlanet } = usePlanetsStore();
+  const [isHovered, setIsHovered] = useState(false);
 
   const radius = scaleRadius(planet.features.radius);
   const distance = scaleDistance(planet.features.distance);
@@ -48,11 +49,13 @@ export const Planet = ({ planet }: PlanetProps) => {
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     setHoveredPlanet(planet);
+    setIsHovered(true);
     document.body.style.cursor = 'pointer';
   };
 
   const handlePointerOut = () => {
     setHoveredPlanet(null);
+    setIsHovered(false);
     document.body.style.cursor = 'default';
   };
 
@@ -99,6 +102,34 @@ export const Planet = ({ planet }: PlanetProps) => {
             opacity={0.2}
           />
         </mesh>
+
+        {/* Tooltip */}
+        {isHovered && hoveredPlanet?.id === planet.id && (
+          <Html
+            position={[0, radius * 2, 0]}
+            center
+            distanceFactor={10}
+            style={{ pointerEvents: 'none' }}
+          >
+            <div className="glass-panel px-4 py-3 rounded-lg max-w-xs animate-fade-in">
+              <div className="space-y-1">
+                <div className="font-semibold text-foreground whitespace-nowrap">
+                  {planet.name || planet.id}
+                </div>
+                {planet.probability !== undefined && (
+                  <div className="text-sm text-muted-foreground">
+                    Probability: {(planet.probability * 100).toFixed(1)}%
+                  </div>
+                )}
+                <div className="text-xs text-muted-foreground space-y-0.5">
+                  <div>Radius: {planet.features.radius.toFixed(2)} R⊕</div>
+                  <div>Period: {planet.features.period.toFixed(1)} days</div>
+                  <div>Distance: {planet.features.distance.toFixed(1)} AU</div>
+                </div>
+              </div>
+            </div>
+          </Html>
+        )}
       </group>
     </>
   );
