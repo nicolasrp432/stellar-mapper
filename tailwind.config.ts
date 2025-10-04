@@ -47,16 +47,17 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
+        'star-glow': 'hsl(var(--star-glow))',
+        'planet-low': 'hsl(var(--planet-low))',
+        'planet-mid': 'hsl(var(--planet-mid))',
+        'planet-high': 'hsl(var(--planet-high))',
+      },
+      boxShadow: {
+        'glow': '0 0 30px hsl(var(--primary) / 0.4)',
+        'panel': '0 8px 32px hsl(220 40% 2% / 0.5)',
+      },
+      backdropBlur: {
+        'glass': '20px',
       },
       borderRadius: {
         lg: "var(--radius)",
