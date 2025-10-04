@@ -12,6 +12,7 @@ export interface PlanetData {
   name?: string;
   probability?: number; // 0-1
   features: PlanetFeatures;
+  isExoplanet?: boolean; // Para el modo profesional
 }
 
 export interface ExoplanetSystemProps {
