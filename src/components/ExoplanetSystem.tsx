@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Scene3D } from './Scene3D';
-import { Tooltip2D } from './Tooltip2D';
 import { PlanetDetailPanel } from './PlanetDetailPanel';
 import { DidacticControls } from './DidacticControls';
 import { ProfessionalUploader } from './ProfessionalUploader';
@@ -120,13 +119,12 @@ export const ExoplanetSystem = ({
 
   return (
     <div className="relative" style={{ width, height }}>
-      {/* 3D Scene */}
+      {/* 3D Scene (includes Tooltip2D inside Canvas) */}
       <Scene3D />
       
       {/* 2D UI Overlay */}
       {showUI && (
         <>
-          <Tooltip2D />
           <PlanetDetailPanel />
           
           {mode === 'didactic' && <DidacticControls />}

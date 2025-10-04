@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { Star } from './Star';
 import { Planet } from './Planet';
+import { Tooltip2D } from './Tooltip2D';
 import { usePlanetsStore } from '@/hooks/usePlanetsStore';
 
 export const Scene3D = () => {
@@ -34,6 +35,9 @@ export const Scene3D = () => {
         maxPolarAngle={Math.PI / 2 + 0.3}
         minPolarAngle={Math.PI / 2 - 0.3}
       />
+      
+      {/* Tooltip (must be inside Canvas to use R3F hooks) */}
+      <Tooltip2D />
     </Canvas>
   );
 };
