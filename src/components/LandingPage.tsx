@@ -12,12 +12,41 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+      {/* Deep space gradient base */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950" />
+      
       {/* Enhanced animated star field background */}
       <AnimatedStarField />
       
-      {/* Additional atmospheric overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+      {/* Central cross light effect - inspired by reference image */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 2, ease: "easeOut" }}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        {/* Vertical light beam */}
+        <div className="absolute w-1 h-full bg-gradient-to-b from-transparent via-yellow-300/90 to-transparent blur-sm" />
+        <div className="absolute w-0.5 h-full bg-gradient-to-b from-transparent via-yellow-100/80 to-transparent" />
+        
+        {/* Horizontal light beam */}
+        <div className="absolute h-1 w-full bg-gradient-to-r from-transparent via-yellow-300/90 to-transparent blur-sm" />
+        <div className="absolute h-0.5 w-full bg-gradient-to-r from-transparent via-yellow-100/80 to-transparent" />
+        
+        {/* Central bright core */}
+        <div className="absolute w-8 h-8 bg-white/90 rounded-full blur-md" />
+        <div className="absolute w-4 h-4 bg-yellow-100 rounded-full blur-sm" />
+        <div className="absolute w-2 h-2 bg-white rounded-full" />
+        
+        {/* Radial glow effect */}
+        <div className="absolute w-96 h-96 bg-gradient-radial from-orange-400/20 via-yellow-300/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute w-64 h-64 bg-gradient-radial from-white/30 via-yellow-200/20 to-transparent rounded-full blur-2xl" />
+      </motion.div>
+      
+      {/* Enhanced atmospheric overlays for better contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
 
       {/* Main content */}
       <div className={`relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto ${isMobile ? 'py-8' : ''}`}>
@@ -40,13 +69,16 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           transition={{ delay: 0.3, duration: 0.8 }}
           className={`${isMobile ? 'mb-4' : 'mb-6'}`}
         >
-          <h1 className={`${isMobile ? 'text-4xl' : 'text-6xl md:text-7xl'} font-bold text-white mb-2`}>
+          <h1 className={`${isMobile ? 'text-4xl' : 'text-6xl md:text-7xl'} font-bold text-white mb-2 drop-shadow-[0_0_20px_rgba(0,0,0,0.8)] [text-shadow:_2px_2px_4px_rgb(0_0_0_/_80%)]`}>
             ExoPlanet{' '}
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8, duration: 1 }}
-              className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500"
+              className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+              style={{
+                filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 20px rgba(147, 51, 234, 0.4))'
+              }}
             >
               Explorer
             </motion.span>
@@ -58,7 +90,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.8 }}
-          className={`${isMobile ? 'text-lg mb-8' : 'text-xl md:text-2xl mb-12'} text-gray-300 max-w-3xl mx-auto`}
+          className={`${isMobile ? 'text-lg mb-8' : 'text-xl md:text-2xl mb-12'} text-blue-100 max-w-3xl mx-auto drop-shadow-[0_0_10px_rgba(0,0,0,0.9)] [text-shadow:_1px_1px_3px_rgb(0_0_0_/_90%)]`}
         >
           Explora cómo la NASA detecta exoplanetas con datos reales e IA
         </motion.p>
@@ -126,7 +158,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.8, duration: 0.8 }}
-          className="text-gray-400 text-center mt-8 max-w-2xl mx-auto"
+          className="text-blue-200/90 text-center mt-8 max-w-2xl mx-auto drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)]"
         >
           Descubre cómo los científicos detectan mundos distantes usando datos reales de misiones espaciales como Kepler y TESS
         </motion.p>
@@ -136,7 +168,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.8, duration: 0.8 }}
-          className="mt-12 text-sm text-gray-400"
+          className="mt-12 text-sm text-blue-300/80 drop-shadow-[0_0_6px_rgba(0,0,0,0.8)] [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)]"
         >
           <p>Modo Didáctico: Experimenta con parámetros interactivos</p>
           <p>Modo Profesional: Analiza datos reales con IA</p>
