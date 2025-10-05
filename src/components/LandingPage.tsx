@@ -68,7 +68,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.3, duration: 0.8 }}
-          className={`flex flex-col ${isMobile ? 'gap-4' : 'lg:flex-row gap-8'} justify-center items-center mt-8`}
+          className={`flex flex-col ${isMobile ? 'gap-6 px-4' : 'lg:flex-row gap-12'} justify-center items-center mt-12`}
         >
           {/* Didactic Button */}
           <motion.div

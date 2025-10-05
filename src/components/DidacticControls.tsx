@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, Info, Play, Pause, Settings, BookOpen } from 'lucide-react';
+import { Plus, Trash2, Info, Play, Settings, BookOpen, Eye, EyeOff, Activity, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePlanetsStore } from '@/hooks/usePlanetsStore';
 import { PlanetData } from '@/types/exoplanet';
@@ -16,13 +16,13 @@ export const DidacticControls = () => {
   const [selectedId, setSelectedId] = useState<string | null>(
     planets.length > 0 ? planets[0].id : null
   );
-  const [isAnimationPaused, setIsAnimationPaused] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [showInfoModal, setShowInfoModal] = useState(false);
-  const [modalTopic, setModalTopic] = useState<'what-is-exoplanet' | 'detection-methods' | 'transit-method' | null>(null);
+  const [modalTopic, setModalTopic] = useState<'what-is-exoplanet' | 'detection-methods' | 'transit-method' | 'radial-velocity' | 'microlensing' | 'planet-types' | null>(null);
   const [showTransitCurve, setShowTransitCurve] = useState(false);
   const [showDetectionMethods, setShowDetectionMethods] = useState(false);
   const [showParameterSliders, setShowParameterSliders] = useState(false);
-  const [activeTab, setActiveTab] = useState<'controls' | 'education' | 'simulation'>('controls');
+  const [activeTab, setActiveTab] = useState<'controls' | 'education' | 'detection'>('controls');
 
   const selectedPlanet = planets.find((p) => p.id === selectedId);
 
@@ -68,28 +68,39 @@ export const DidacticControls = () => {
 
   return (
     <>
+      {/* Floating button to show panel when hidden */}
+      {!visible && (
+        <button
+          onClick={() => setVisible(true)}
+          className="fixed left-4 top-20 bg-gray-800 text-white rounded-full p-3 z-50 shadow-lg hover:bg-gray-700 transition-all"
+        >
+          <Eye className="h-5 w-5" />
+        </button>
+      )}
+
+      {visible && (
       <motion.div
         initial={{ opacity: 0, x: isMobile ? 0 : -300, y: isMobile ? 300 : 0 }}
         animate={{ opacity: 1, x: 0, y: 0 }}
         className={`fixed ${
           isMobile 
-            ? 'left-2 right-2 bottom-2 top-auto h-[60vh]' 
-            : 'left-4 top-4 bottom-4 w-80'
+            ? 'left-2 right-2 bottom-2 h-[60vh]' 
+            : 'left-4 bottom-4 w-72'
         } glass-panel overflow-hidden z-40 flex flex-col touch-manipulation`}
+        style={{ top: "4rem" }}
+        
       >
         {/* Header with tabs */}
         <div className={`${isMobile ? 'p-3' : 'p-4'} border-b border-white/10`}>
           <div className={`flex items-center justify-between ${isMobile ? 'mb-3' : 'mb-4'}`}>
             <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold`}>Explorador Didáctico</h2>
             <div className="flex gap-1">
-              <Button
-                size="sm"
-                variant={isAnimationPaused ? "default" : "outline"}
-                onClick={() => setIsAnimationPaused(!isAnimationPaused)}
-                className={`${isMobile ? 'h-9 w-9' : 'h-8 w-8'} p-0 touch-manipulation`}
+              <button
+                onClick={() => setVisible(!visible)}
+                className="inline-flex items-center justify-center gap-2 h-8 w-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-all"
               >
-                {isAnimationPaused ? <Play className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} /> : <Pause className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />}
-              </Button>
+                {visible ? <EyeOff className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} /> : <Eye className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'}`} />}
+              </button>
               <Button
                 size="sm"
                 onClick={handleAddPlanet}
@@ -125,15 +136,15 @@ export const DidacticControls = () => {
               Aprender
             </button>
             <button
-              onClick={() => setActiveTab('simulation')}
+              onClick={() => setActiveTab('detection')}
               className={`flex-1 ${isMobile ? 'px-3 py-2' : 'px-2 py-1'} rounded ${isMobile ? 'text-sm' : 'text-xs'} font-medium transition-all touch-manipulation ${
-                activeTab === 'simulation'
+                activeTab === 'detection'
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Info className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'} mx-auto ${isMobile ? 'mb-1' : 'mb-1'}`} />
-              Simular
+              <Play className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'} mx-auto ${isMobile ? 'mb-1' : 'mb-1'}`} />
+              Detección
             </button>
           </div>
         </div>
@@ -243,12 +254,64 @@ export const DidacticControls = () => {
                 </Button>
 
                 <Button
+                  onClick={() => {
+                    setModalTopic('planet-types');
+                    setShowInfoModal(true);
+                  }}
+                  className="w-full justify-start bg-indigo-600 hover:bg-indigo-700"
+                >
+                  <Info className="h-4 w-4 mr-2" />
+                  Tipos de Exoplanetas
+                </Button>
+
+                <Button
                   onClick={() => setShowDetectionMethods(true)}
                   className="w-full justify-start bg-purple-600 hover:bg-purple-700"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Métodos de Detección
                 </Button>
+
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Métodos Específicos
+                  </h4>
+                  
+                  <Button
+                    onClick={() => {
+                      setShowTransitCurve(true);
+                    }}
+                    className="w-full justify-start bg-green-600 hover:bg-green-700 text-sm"
+                    size="sm"
+                  >
+                    <Play className="h-3 w-3 mr-2" />
+                    Método de Tránsito
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      setModalTopic('radial-velocity');
+                      setShowInfoModal(true);
+                    }}
+                    className="w-full justify-start bg-orange-600 hover:bg-orange-700 text-sm"
+                    size="sm"
+                  >
+                    <Settings className="h-3 w-3 mr-2" />
+                    Velocidad Radial
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      setModalTopic('microlensing');
+                      setShowInfoModal(true);
+                    }}
+                    className="w-full justify-start bg-red-600 hover:bg-red-700 text-sm"
+                    size="sm"
+                  >
+                    <BookOpen className="h-3 w-3 mr-2" />
+                    Microlente Gravitacional
+                  </Button>
+                </div>
 
                 <div className="glass-panel p-4 rounded-lg">
                   <h4 className="font-semibold mb-2 text-sm">Datos del Planeta Seleccionado</h4>
@@ -267,31 +330,58 @@ export const DidacticControls = () => {
             </div>
           )}
 
-          {activeTab === 'simulation' && (
+          {activeTab === 'detection' && (
             <div className="space-y-4">
-              <Button
-                onClick={() => setShowTransitCurve(true)}
-                className="w-full justify-start bg-green-600 hover:bg-green-700"
-              >
-                <Play className="h-4 w-4 mr-2" />
-                Simular Curva de Tránsito
-              </Button>
+              <div className="glass-panel p-4 rounded-lg bg-primary/10 border-primary/30">
+                <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
+                  <Play className="h-4 w-4 text-primary" />
+                  Métodos de Detección
+                </h4>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Explora cómo los científicos detectan exoplanetas usando diferentes técnicas.
+                </p>
+              </div>
 
-              <Button
-                onClick={() => setShowParameterSliders(true)}
-                className="w-full justify-start bg-orange-600 hover:bg-orange-700"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Parámetros Avanzados
-              </Button>
+              <div className="space-y-3">
+                <Button
+                  onClick={() => setShowTransitCurve(true)}
+                  className="w-full justify-start bg-blue-600 hover:bg-blue-700"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Método de Tránsito
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    setModalTopic('radial-velocity');
+                    setShowInfoModal(true);
+                  }}
+                  className="w-full justify-start bg-green-600 hover:bg-green-700"
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  Velocidad Radial
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    setModalTopic('microlensing');
+                    setShowInfoModal(true);
+                  }}
+                  className="w-full justify-start bg-purple-600 hover:bg-purple-700"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Microlente Gravitacional
+                </Button>
+              </div>
 
               {selectedPlanet && (
                 <div className="glass-panel p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2 text-sm">Propiedades Calculadas</h4>
+                  <h4 className="font-semibold mb-2 text-sm">Análisis del Planeta</h4>
                   <div className="space-y-1 text-xs">
                     <div>Profundidad de Tránsito: ~{(selectedPlanet.features.radius * selectedPlanet.features.radius * 100).toFixed(0)} ppm</div>
                     <div>Duración: ~{(selectedPlanet.features.radius * 2).toFixed(1)} horas</div>
                     <div>Tipo: {selectedPlanet.features.radius < 1.5 ? 'Rocoso' : selectedPlanet.features.radius < 4 ? 'Neptuno' : 'Gigante Gaseoso'}</div>
+                    <div>Detectabilidad: {selectedPlanet.probability && selectedPlanet.probability > 0.7 ? 'Alta' : selectedPlanet.probability && selectedPlanet.probability > 0.4 ? 'Media' : 'Baja'}</div>
                   </div>
                 </div>
               )}
@@ -299,6 +389,7 @@ export const DidacticControls = () => {
           )}
         </div>
       </motion.div>
+      )}
 
       {/* Modals and Overlays */}
       <ExoplanetInfoModal 
@@ -310,15 +401,16 @@ export const DidacticControls = () => {
         topic={modalTopic}
       />
 
-      {showTransitCurve && selectedPlanet && (
+      {showTransitCurve && (
         <TransitLightCurve
           isActive={showTransitCurve}
-          planetRadius={selectedPlanet.features.radius}
-          orbitalPeriod={selectedPlanet.features.period}
+          planetRadius={selectedPlanet?.features.radius || 1.0}
+          orbitalPeriod={selectedPlanet?.features.period || 365}
           onInfoClick={() => {
             setModalTopic('transit-method');
             setShowInfoModal(true);
           }}
+          onClose={() => setShowTransitCurve(false)}
         />
       )}
 

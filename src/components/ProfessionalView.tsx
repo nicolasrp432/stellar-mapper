@@ -7,16 +7,18 @@ import { ProfessionalUploader } from './ProfessionalUploader';
 import { Professional3DVisualization } from './Professional3DVisualization';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-// Mock data simulado
-const MOCK_EXOPLANETS: PlanetData[] = [
-  { id: '1', name: 'Kepler-22b', probability: 0.87, features: { radius: 2.4, period: 290, distance: 8.5 }, isExoplanet: true },
-  { id: '2', name: 'Kepler-452b', probability: 0.92, features: { radius: 1.6, period: 385, distance: 10.2 }, isExoplanet: true },
-  { id: '3', name: 'KOI-1234', probability: 0.23, features: { radius: 0.8, period: 120, distance: 4.5 }, isExoplanet: false },
-  { id: '4', name: 'Kepler-186f', probability: 0.78, features: { radius: 1.1, period: 130, distance: 6.3 }, isExoplanet: true },
-  { id: '5', name: 'KOI-5678', probability: 0.15, features: { radius: 0.6, period: 45, distance: 2.1 }, isExoplanet: false },
-  { id: '6', name: 'Kepler-442b', probability: 0.89, features: { radius: 1.3, period: 112, distance: 5.8 }, isExoplanet: true },
-  { id: '7', name: 'KOI-9012', probability: 0.31, features: { radius: 1.0, period: 200, distance: 7.5 }, isExoplanet: false },
-  { id: '8', name: 'Kepler-62f', probability: 0.85, features: { radius: 1.4, period: 267, distance: 9.1 }, isExoplanet: true },
+// CSV simulado basado en datos reales
+const SIMULATED_CSV_DATA: PlanetData[] = [
+  { id: '1', name: 'Kepler-22b', probability: 0.91, features: { radius: 2.4, period: 289.9, distance: 8.5, depth: 400, snr: 18.2 }, isExoplanet: true },
+  { id: '2', name: 'KOI-351c', probability: 0.82, features: { radius: 1.8, period: 331.6, distance: 7.2, depth: 120, snr: 9.1 }, isExoplanet: true },
+  { id: '3', name: 'KIC-8462852', probability: 0.25, features: { radius: 1.0, period: 700.0, distance: 12.1, depth: 40, snr: 2.5 }, isExoplanet: false },
+  { id: '4', name: 'Kepler-9b', probability: 0.88, features: { radius: 1.2, period: 19.2, distance: 2.1, depth: 210, snr: 11.0 }, isExoplanet: true },
+  { id: '5', name: 'TESS-1013', probability: 0.33, features: { radius: 0.8, period: 4.2, distance: 1.5, depth: 60, snr: 3.3 }, isExoplanet: false },
+  { id: '6', name: 'Kepler-10c', probability: 0.76, features: { radius: 1.4, period: 45.3, distance: 3.8, depth: 80, snr: 4.8 }, isExoplanet: true },
+  { id: '7', name: 'KOI-12b', probability: 0.20, features: { radius: 0.9, period: 17.3, distance: 2.0, depth: 30, snr: 2.0 }, isExoplanet: false },
+  { id: '8', name: 'WASP-12b', probability: 0.95, features: { radius: 1.8, period: 1.1, distance: 0.8, depth: 600, snr: 23.7 }, isExoplanet: true },
+  { id: '9', name: 'TOI-700d', probability: 0.74, features: { radius: 1.1, period: 37.4, distance: 3.2, depth: 90, snr: 5.6 }, isExoplanet: true },
+  { id: '10', name: 'K2-18b', probability: 0.68, features: { radius: 2.3, period: 33.0, distance: 2.8, depth: 70, snr: 4.0 }, isExoplanet: true },
 ];
 
 export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string }) => {
@@ -25,15 +27,15 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetData | null>(null);
   const [hasUploadedData, setHasUploadedData] = useState(false);
 
-  // Show mock data only after upload simulation or if data exists
+  // Show data only after upload
   useEffect(() => {
-    if (planets.length === 0 && hasUploadedData) {
-      setPlanets(MOCK_EXOPLANETS);
+    if (!hasUploadedData) {
+      setSelectedPlanet(null);
     }
-  }, [planets.length, setPlanets, hasUploadedData]);
+  }, [hasUploadedData]);
 
   const displayPlanets = planets.length > 0 ? planets : [];
-  const showData = displayPlanets.length > 0;
+  const showData = hasUploadedData && displayPlanets.length > 0;
 
   return (
     <div className="h-screen bg-background relative overflow-hidden">
@@ -41,11 +43,8 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
       <motion.div
         initial={{ opacity: 0, x: isMobile ? 0 : -300, y: isMobile ? -300 : 0 }}
         animate={{ opacity: 1, x: 0, y: 0 }}
-        className={`fixed ${
-          isMobile 
-            ? 'left-2 right-2 top-2 h-auto max-h-[40vh]' 
-            : 'left-4 top-4 bottom-4 w-96'
-        } glass-panel overflow-hidden z-40 touch-manipulation`}
+        className={"fixed left-4 bottom-4 w-96 glass-panel overflow-hidden z-40 touch-manipulation"}
+        style={{ top: '2rem' }}
       >
         <ProfessionalUploader 
           endpoint={endpoint} 
@@ -187,16 +186,18 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
                           </td>
                           <td className={`${isMobile ? 'px-2 py-2' : 'px-4 py-3'} text-center`}>
                             {isExoplanet ? (
-                              <div className="flex items-center justify-center gap-1">
-                                <CheckCircle className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-green-500`} />
-                                <span className={`${isMobile ? 'text-xs' : 'text-xs'} font-medium text-green-500`}>
+                              <div className="flex items-center justify-center gap-2">
+                                <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                                <CheckCircle className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-green-400`} />
+                                <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-green-400`}>
                                   {isMobile ? 'Exo' : 'Exoplaneta'}
                                 </span>
                               </div>
                             ) : (
-                              <div className="flex items-center justify-center gap-1">
-                                <XCircle className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-red-500`} />
-                                <span className={`${isMobile ? 'text-xs' : 'text-xs'} font-medium text-red-500`}>
+                              <div className="flex items-center justify-center gap-2">
+                                <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                                <XCircle className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-red-400`} />
+                                <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-red-400`}>
                                   {isMobile ? 'Falso' : 'Falso Positivo'}
                                 </span>
                               </div>

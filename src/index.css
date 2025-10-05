@@ -78,6 +78,14 @@ All colors MUST be HSL.
   .glass-panel {
     @apply bg-card/70 backdrop-blur-xl border border-white/10 shadow-2xl;
   }
+  /* Custom top adjustment to avoid overlapping with the fixed header */
+  .custom-top-adjustment {
+    top: 5rem;
+  }
+  /* Override Tailwind .top-4 to push panel below fixed header */
+  .top-4 {
+    top: 5rem;
+  }
   
   .star-glow {
     filter: drop-shadow(0 0 30px hsl(45 100% 60%));

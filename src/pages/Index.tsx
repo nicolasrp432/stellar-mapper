@@ -39,7 +39,9 @@ const Index = () => {
     return (
       <>
         <Header onBackToHome={handleBackToHome} showBackButton />
-        <ProfessionalView endpoint="/api/analyze" />
+        <main className="pt-20">
+          <ProfessionalView endpoint="/api/analyze" />
+        </main>
       </>
     );
   }
@@ -50,57 +52,42 @@ const Index = () => {
       {/* Header */}
       <Header onBackToHome={handleBackToHome} showBackButton />
 
-      {/* Mode switcher */}
-      <div className={`absolute ${isMobile ? 'top-20 right-2' : 'top-24 right-6'} z-50`}>
-        <div className={`glass-panel ${isMobile ? 'p-0.5' : 'p-1'} rounded-lg flex gap-1`}>
-          <Button
-            variant={mode === 'didactic' ? 'default' : 'ghost'}
-            size={isMobile ? 'sm' : 'sm'}
-            onClick={() => handleSelectMode('didactic')}
-            className={`${mode === 'didactic' ? 'bg-primary' : ''} ${isMobile ? 'px-2 py-1 text-xs' : ''} touch-manipulation`}
-          >
-            <FlaskConical className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
-            {isMobile ? 'Didáctico' : 'Didactic'}
-          </Button>
-          <Button
-            variant={mode === 'professional' ? 'default' : 'ghost'}
-            size={isMobile ? 'sm' : 'sm'}
-            onClick={() => handleSelectMode('professional')}
-            className={`${mode === 'professional' ? 'bg-primary' : ''} ${isMobile ? 'px-2 py-1 text-xs' : ''} touch-manipulation`}
-          >
-            <Telescope className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
-            {isMobile ? 'Pro' : 'Professional'}
-          </Button>
+      {/* Main content with top margin for fixed header */}
+      <main className="pt-20">
+        {/* Mode switcher - Centered */}
+        <div className="flex justify-center items-center py-8">
+          <div className={`glass-panel ${isMobile ? 'p-1' : 'p-2'} rounded-lg flex ${isMobile ? 'flex-col gap-2' : 'gap-6'}`}>
+            <Button
+              variant={mode === 'didactic' ? 'default' : 'ghost'}
+              size={isMobile ? 'default' : 'lg'}
+              onClick={() => handleSelectMode('didactic')}
+              className={`${mode === 'didactic' ? 'bg-primary' : ''} ${isMobile ? 'px-4 py-3 text-sm w-full' : 'px-6 py-3 text-lg'} touch-manipulation`}
+            >
+              <FlaskConical className={`${isMobile ? 'h-4 w-4 mr-2' : 'h-5 w-5 mr-3'}`} />
+              {isMobile ? 'Modo Didáctico' : 'Didactic Mode'}
+            </Button>
+            <Button
+              variant={mode === 'professional' ? 'default' : 'ghost'}
+              size={isMobile ? 'default' : 'lg'}
+              onClick={() => handleSelectMode('professional')}
+              className={`${mode === 'professional' ? 'bg-primary' : ''} ${isMobile ? 'px-4 py-3 text-sm w-full' : 'px-6 py-3 text-lg'} touch-manipulation`}
+            >
+              <Telescope className={`${isMobile ? 'h-4 w-4 mr-2' : 'h-5 w-5 mr-3'}`} />
+              {isMobile ? 'Modo Profesional' : 'Professional Mode'}
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* Info Panel */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className={`absolute ${isMobile ? 'bottom-4 left-2 right-2' : 'bottom-6 left-1/2 transform -translate-x-1/2'} z-50`}
-      >
-        <div className={`glass-panel ${isMobile ? 'px-3 py-2' : 'px-6 py-3'} rounded-full ${isMobile ? '' : 'max-w-2xl'}`}>
-          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-center text-muted-foreground`}>
-            <span className="font-medium text-foreground">
-              {isMobile ? 'Modo Didáctico:' : 'Didactic Mode:'}
-            </span> 
-            {isMobile ? ' Ajusta parámetros planetarios' : ' Use sliders to adjust planet parameters and see real-time changes'}
-          </p>
-        </div>
-      </motion.div>
+        {/* 3D Visualization */}
+        <ExoplanetSystem
+          mode={mode}
+          onPlanetSelect={handlePlanetSelect}
+          fetchEndpoint="/api/analyze"
+          showUI={true}
+        />
 
-      {/* 3D Visualization */}
-      <ExoplanetSystem
-        mode={mode}
-        onPlanetSelect={handlePlanetSelect}
-        fetchEndpoint="/api/analyze"
-        showUI={true}
-      />
+      </main>
 
-      {/* Background gradient overlay */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-background/50" />
     </div>
   );
 };

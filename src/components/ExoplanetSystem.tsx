@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Scene3D } from './Scene3D';
 import { PlanetDetailPanel } from './PlanetDetailPanel';
 import { DidacticControls } from './DidacticControls';
@@ -6,6 +6,9 @@ import { ProfessionalUploader } from './ProfessionalUploader';
 import { ExoplanetSystemProps, PlanetData } from '@/types/exoplanet';
 import { usePlanetsStore } from '@/hooks/usePlanetsStore';
 import { useFetchPlanets } from '@/hooks/useFetchPlanets';
+import { Button } from '@/components/ui/button';
+import { PauseCircle, RefreshCcw, Sparkles } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const DEFAULT_DIDACTIC_PLANETS: PlanetData[] = [
   {
@@ -63,6 +66,17 @@ export const ExoplanetSystem = ({
     fetchEndpoint,
     mode === 'professional' && !externalPlanets
   );
+  const isMobile = useIsMobile();
+  const [paused, setPaused] = useState(false);
+  const [realisticMode, setRealisticMode] = useState(true);
+
+  const togglePause = () => setPaused((p) => !p);
+  const resetPositions = () => {
+    if (mode === 'didactic') {
+      setPlanets(DEFAULT_DIDACTIC_PLANETS);
+    }
+  };
+  const toggleMode = () => setRealisticMode((m) => !m);
 
   // Initialize planets based on mode
   useEffect(() => {
@@ -118,10 +132,47 @@ export const ExoplanetSystem = ({
   }
 
   return (
-    <div className="relative" style={{ width, height }}>
-      {/* 3D Scene (includes Tooltip2D inside Canvas) */}
-      <Scene3D />
+    <div className="relative w-full min-h-[400px] h-[calc(100vh-200px)]" style={{ width, height }}>
+      {/* 3D Scene Container with proper sizing */}
+      <div className="absolute inset-0 w-full h-full">
+        <Scene3D paused={paused} realisticMode={realisticMode} />
+      </div>
       
+      {/* Scene Controls - Bottom Center */}
+      {mode === 'didactic' && (
+        <div className={`absolute ${isMobile ? 'bottom-5 left-2 right-2' : 'bottom-5 left-1/2 -translate-x-1/2'} z-40`}>
+          <div className={`glass-panel p-2 rounded-lg flex ${isMobile ? 'flex-col gap-2' : 'gap-4'} justify-center`}>
+            <Button
+              variant={paused ? 'default' : 'ghost'}
+              size={isMobile ? 'sm' : 'default'}
+              onClick={togglePause}
+              className={`${isMobile ? 'w-full' : ''} touch-manipulation`}
+            >
+              <PauseCircle className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
+              {paused ? 'Reanudar' : 'Pausar'}
+            </Button>
+            <Button
+              variant={'ghost'}
+              size={isMobile ? 'sm' : 'default'}
+              onClick={resetPositions}
+              className={`${isMobile ? 'w-full' : ''} touch-manipulation`}
+            >
+              <RefreshCcw className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
+              Reiniciar órbitas
+            </Button>
+            <Button
+              variant={realisticMode ? 'default' : 'ghost'}
+              size={isMobile ? 'sm' : 'default'}
+              onClick={toggleMode}
+              className={`${isMobile ? 'w-full' : ''} touch-manipulation`}
+            >
+              <Sparkles className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
+              {realisticMode ? 'Modo realista' : 'Modo simplificado'}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* 2D UI Overlay */}
       {showUI && (
         <>

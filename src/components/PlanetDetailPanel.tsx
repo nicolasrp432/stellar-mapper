@@ -45,7 +45,8 @@ export const PlanetDetailPanel = () => {
         initial={{ opacity: 0, x: 300 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 300 }}
-        className="fixed right-4 top-4 bottom-4 w-96 glass-panel p-6 overflow-y-auto z-40"
+        className="fixed right-4 bottom-4 w-96 glass-panel p-6 overflow-y-auto z-40"
+        style={{ top: "4rem" }}
       >
         <div className="flex justify-between items-start mb-6">
           <div>

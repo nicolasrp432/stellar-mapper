@@ -1,5 +1,6 @@
 import { useRef, useMemo, useState } from 'react';
-import { Mesh, Group, Vector3, CanvasTexture } from 'three';
+import { Mesh, Group, Vector3, CanvasTexture, Vector2 } from 'three';
+import * as THREE from 'three';
 import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { Line, Html } from '@react-three/drei';
 import { PlanetData } from '@/types/exoplanet';
@@ -14,66 +15,185 @@ import { usePlanetsStore } from '@/hooks/usePlanetsStore';
 
 interface PlanetProps {
   planet: PlanetData;
+  paused?: boolean;
+  simplified?: boolean;
 }
 
-// Function to create procedural planet texture
+// Enhanced function to create realistic planet textures
 const createPlanetTexture = (type: 'rocky' | 'gas' | 'ice', color: string) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d')!;
+
+  // Noise function for realistic surface patterns
+  const noise = (x: number, y: number, scale: number = 1) => {
+    const nx = x * scale;
+    const ny = y * scale;
+    return (Math.sin(nx * 0.1) + Math.sin(ny * 0.1) + Math.sin((nx + ny) * 0.05)) / 3;
+  };
+
+  // Create base texture based on planet type
+  const imageData = ctx.createImageData(1024, 512);
+  const data = imageData.data;
+
+  for (let y = 0; y < 512; y++) {
+    for (let x = 0; x < 1024; x++) {
+      const index = (y * 1024 + x) * 4;
+      const noiseValue = noise(x, y, 0.01) * 0.5 + 0.5;
+      const detailNoise = noise(x, y, 0.05) * 0.3 + 0.7;
+      const fineNoise = noise(x, y, 0.1) * 0.2 + 0.8;
+      
+      let r, g, b;
+      
+      switch (type) {
+        case 'rocky':
+          // Earth-like rocky planet with continents and oceans
+          if (noiseValue > 0.6) {
+            // Land masses - browns and greens
+            r = Math.floor((139 + noiseValue * 50) * detailNoise);
+            g = Math.floor((69 + noiseValue * 80) * detailNoise);
+            b = Math.floor((19 + noiseValue * 30) * detailNoise);
+          } else if (noiseValue > 0.4) {
+            // Coastal areas - sandy colors
+            r = Math.floor((194 + noiseValue * 30) * detailNoise);
+            g = Math.floor((178 + noiseValue * 40) * detailNoise);
+            b = Math.floor((128 + noiseValue * 20) * detailNoise);
+          } else {
+            // Ocean areas - blues
+            r = Math.floor((30 + noiseValue * 40) * detailNoise);
+            g = Math.floor((144 + noiseValue * 60) * detailNoise);
+            b = Math.floor((255 * (0.6 + noiseValue * 0.4)) * detailNoise);
+          }
+          break;
+          
+        case 'gas':
+          // Jupiter-like gas giant with bands
+          const bandY = Math.sin(y * 0.02) * 0.5 + 0.5;
+          const bandPattern = Math.sin(y * 0.1 + x * 0.001) * 0.3 + 0.7;
+          
+          if (bandY > 0.7) {
+            // Light bands - cream/yellow
+            r = Math.floor((255 * (0.9 + noiseValue * 0.1)) * bandPattern);
+            g = Math.floor((228 * (0.8 + noiseValue * 0.2)) * bandPattern);
+            b = Math.floor((181 * (0.7 + noiseValue * 0.3)) * bandPattern);
+          } else if (bandY > 0.3) {
+            // Medium bands - orange/brown
+            r = Math.floor((222 * (0.8 + noiseValue * 0.2)) * bandPattern);
+            g = Math.floor((184 * (0.7 + noiseValue * 0.3)) * bandPattern);
+            b = Math.floor((135 * (0.6 + noiseValue * 0.4)) * bandPattern);
+          } else {
+            // Dark bands - deep brown/red
+            r = Math.floor((139 * (0.6 + noiseValue * 0.4)) * bandPattern);
+            g = Math.floor((69 * (0.5 + noiseValue * 0.5)) * bandPattern);
+            b = Math.floor((19 * (0.4 + noiseValue * 0.6)) * bandPattern);
+          }
+          break;
+          
+        case 'ice':
+          // Europa-like ice world with cracks
+          const crackPattern = Math.abs(noise(x, y, 0.02)) > 0.3 ? 0.3 : 1.0;
+          r = Math.floor((224 + noiseValue * 31) * crackPattern * fineNoise);
+          g = Math.floor((255 * (0.9 + noiseValue * 0.1)) * crackPattern * fineNoise);
+          b = Math.floor((255 * (0.95 + noiseValue * 0.05)) * crackPattern * fineNoise);
+          break;
+          
+        default:
+          r = g = b = 128;
+      }
+      
+      data[index] = Math.min(255, Math.max(0, r));
+      data[index + 1] = Math.min(255, Math.max(0, g));
+      data[index + 2] = Math.min(255, Math.max(0, b));
+      data[index + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+
+  // Add additional surface features
+  ctx.globalCompositeOperation = 'overlay';
+  
+  if (type === 'rocky') {
+    // Add cloud patterns
+    for (let i = 0; i < 20; i++) {
+      const x = Math.random() * 1024;
+      const y = Math.random() * 512;
+      const size = Math.random() * 100 + 50;
+      
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x - size, y - size, size * 2, size * 2);
+    }
+  } else if (type === 'gas') {
+    // Add storm systems
+    for (let i = 0; i < 5; i++) {
+      const x = Math.random() * 1024;
+      const y = Math.random() * 512;
+      const size = Math.random() * 80 + 40;
+      
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = '#8B0000';
+      ctx.beginPath();
+      ctx.ellipse(x, y, size, size * 0.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (type === 'ice') {
+    // Add ice crack details
+    ctx.globalAlpha = 0.6;
+    ctx.strokeStyle = '#4682B4';
+    ctx.lineWidth = 2;
+    
+    for (let i = 0; i < 30; i++) {
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * 1024, Math.random() * 512);
+      ctx.lineTo(Math.random() * 1024, Math.random() * 512);
+      ctx.stroke();
+    }
+  }
+
+  return new CanvasTexture(canvas);
+};
+
+// Function to create normal maps for surface detail
+const createNormalMap = (type: 'rocky' | 'gas' | 'ice') => {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
 
-  // Create gradient based on planet type
-  const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-  
-  switch (type) {
-    case 'rocky':
-      gradient.addColorStop(0, '#8B4513');
-      gradient.addColorStop(0.3, '#CD853F');
-      gradient.addColorStop(0.6, '#D2691E');
-      gradient.addColorStop(1, '#A0522D');
-      break;
-    case 'gas':
-      gradient.addColorStop(0, '#FFE4B5');
-      gradient.addColorStop(0.2, '#DEB887');
-      gradient.addColorStop(0.5, '#F4A460');
-      gradient.addColorStop(0.8, '#D2691E');
-      gradient.addColorStop(1, '#CD853F');
-      break;
-    case 'ice':
-      gradient.addColorStop(0, '#E0FFFF');
-      gradient.addColorStop(0.3, '#B0E0E6');
-      gradient.addColorStop(0.6, '#87CEEB');
-      gradient.addColorStop(1, '#4682B4');
-      break;
-  }
+  const imageData = ctx.createImageData(512, 256);
+  const data = imageData.data;
 
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, 512, 256);
-
-  // Add surface details
-  for (let i = 0; i < 100; i++) {
-    const x = Math.random() * 512;
-    const y = Math.random() * 256;
-    const size = Math.random() * 20 + 5;
-    
-    ctx.globalAlpha = 0.3;
-    ctx.fillStyle = type === 'gas' ? '#8B4513' : '#696969';
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Add atmospheric bands for gas giants
-  if (type === 'gas') {
-    for (let i = 0; i < 8; i++) {
-      const y = (i / 8) * 256;
-      ctx.globalAlpha = 0.2;
-      ctx.fillStyle = i % 2 === 0 ? '#DEB887' : '#CD853F';
-      ctx.fillRect(0, y, 512, 32);
+  for (let y = 0; y < 256; y++) {
+    for (let x = 0; x < 512; x++) {
+      const index = (y * 512 + x) * 4;
+      
+      // Generate height map based on noise
+      const height = Math.sin(x * 0.02) * Math.cos(y * 0.02) * 0.5 + 0.5;
+      const detail = Math.sin(x * 0.1) * Math.sin(y * 0.1) * 0.2;
+      
+      // Calculate normal from height differences
+      const heightL = Math.sin((x - 1) * 0.02) * Math.cos(y * 0.02) * 0.5 + 0.5;
+      const heightR = Math.sin((x + 1) * 0.02) * Math.cos(y * 0.02) * 0.5 + 0.5;
+      const heightU = Math.sin(x * 0.02) * Math.cos((y - 1) * 0.02) * 0.5 + 0.5;
+      const heightD = Math.sin(x * 0.02) * Math.cos((y + 1) * 0.02) * 0.5 + 0.5;
+      
+      const normalX = (heightL - heightR) * 0.5 + 0.5;
+      const normalY = (heightU - heightD) * 0.5 + 0.5;
+      const normalZ = 0.8; // Pointing mostly outward
+      
+      data[index] = Math.floor(normalX * 255);     // Red = X normal
+      data[index + 1] = Math.floor(normalY * 255); // Green = Y normal  
+      data[index + 2] = Math.floor(normalZ * 255); // Blue = Z normal
+      data[index + 3] = 255;                       // Alpha
     }
   }
 
+  ctx.putImageData(imageData, 0, 0);
   return new CanvasTexture(canvas);
 };
 
@@ -84,7 +204,7 @@ const getPlanetType = (planet: PlanetData): 'rocky' | 'gas' | 'ice' => {
   return 'rocky'; // Default to rocky
 };
 
-export const Planet = ({ planet }: PlanetProps) => {
+export const Planet = ({ planet, paused = false, simplified = false }: PlanetProps) => {
   const groupRef = useRef<Group>(null);
   const meshRef = useRef<Mesh>(null);
   const atmosphereRef = useRef<Mesh>(null);
@@ -94,11 +214,17 @@ export const Planet = ({ planet }: PlanetProps) => {
   const radius = scaleRadius(planet.features.radius);
   const distance = scaleDistance(planet.features.distance);
   const angularVelocity = scalePeriod(planet.features.period);
-  const color = getProbabilityColor(planet.probability);
+  const color = planet.isExoplanet !== undefined
+    ? (planet.isExoplanet ? '#22c55e' : '#f87171')
+    : getProbabilityColor(planet.probability);
 
   // Determine planet type and create texture
   const planetType = useMemo(() => getPlanetType(planet), [planet]);
   const planetTexture = useMemo(() => createPlanetTexture(planetType, color), [planetType, color]);
+
+  const normalMap = useMemo(() => {
+    return createNormalMap(planetType);
+  }, [planetType]);
 
   // Generate orbit path with slight ellipse
   const orbitPoints = useMemo(() => {
@@ -120,6 +246,7 @@ export const Planet = ({ planet }: PlanetProps) => {
   }, [planet.features.distance]);
 
   useFrame(({ clock }) => {
+    if (paused) return;
     if (groupRef.current) {
       const angle = clock.elapsedTime * angularVelocity;
       const [x, y, z] = calculateOrbitalPosition(angle, planet.features.distance);
@@ -187,18 +314,30 @@ export const Planet = ({ planet }: PlanetProps) => {
           scale={isHovered ? 1.2 : 1}
         >
           <sphereGeometry args={[radius, 64, 32]} />
-          <meshStandardMaterial
-            map={planetTexture}
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.05}
-            roughness={planetType === 'ice' ? 0.1 : 0.8}
-            metalness={planetType === 'rocky' ? 0.3 : 0.1}
-          />
+          {simplified ? (
+            <meshStandardMaterial
+              color={color}
+              roughness={0.8}
+              metalness={0.0}
+            />
+          ) : (
+            <meshStandardMaterial
+              map={planetTexture}
+              normalMap={normalMap}
+              normalScale={new THREE.Vector2(planetType === 'rocky' ? 1.5 : 0.8, planetType === 'rocky' ? 1.5 : 0.8)}
+              color={color}
+              emissive={color}
+              emissiveIntensity={planetType === 'gas' ? 0.1 : 0.05}
+              roughness={planetType === 'ice' ? 0.1 : planetType === 'gas' ? 0.9 : 0.7}
+              metalness={planetType === 'rocky' ? 0.4 : planetType === 'ice' ? 0.2 : 0.05}
+              envMapIntensity={planetType === 'ice' ? 1.5 : 0.8}
+              bumpScale={planetType === 'rocky' ? 0.02 : 0.01}
+            />
+          )}
         </mesh>
 
         {/* Atmosphere for gas giants */}
-        {planetType === 'gas' && (
+        {!simplified && planetType === 'gas' && (
           <mesh
             ref={atmosphereRef}
             scale={isHovered ? 1.35 : 1.15}
@@ -214,7 +353,7 @@ export const Planet = ({ planet }: PlanetProps) => {
         )}
         
         {/* Enhanced glow effect */}
-        {isHovered && (
+        {!simplified && isHovered && (
           <>
             <mesh scale={1.4}>
               <sphereGeometry args={[radius, 16, 16]} />
@@ -240,7 +379,7 @@ export const Planet = ({ planet }: PlanetProps) => {
         )}
 
         {/* Ring system for some gas giants */}
-        {planetType === 'gas' && planet.features.radius > 2.5 && (
+        {!simplified && planetType === 'gas' && planet.features.radius > 2.5 && (
           <mesh
             rotation={[Math.PI / 2, 0, 0]}
           >
