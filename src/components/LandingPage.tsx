@@ -70,7 +70,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           className={`${isMobile ? 'mb-4' : 'mb-6'}`}
         >
           <h1 className={`${isMobile ? 'text-4xl' : 'text-6xl md:text-7xl'} font-bold text-white mb-2 drop-shadow-[0_0_20px_rgba(0,0,0,0.8)] [text-shadow:_2px_2px_4px_rgb(0_0_0_/_80%)]`}>
-            ExoPlanet{' '}
+            Exo
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -80,7 +80,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
                 filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 20px rgba(147, 51, 234, 0.4))'
               }}
             >
-              Explorer
+              Vision
             </motion.span>
           </h1>
         </motion.div>
@@ -92,7 +92,8 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           transition={{ delay: 1, duration: 0.8 }}
           className={`${isMobile ? 'text-lg mb-8' : 'text-xl md:text-2xl mb-12'} text-blue-100 max-w-3xl mx-auto drop-shadow-[0_0_10px_rgba(0,0,0,0.9)] [text-shadow:_1px_1px_3px_rgb(0_0_0_/_90%)]`}
         >
-          Explora cómo la NASA detecta exoplanetas con datos reales e IA
+          Explore how NASA detects exoplanets using real data and AI
+
         </motion.p>
 
         {/* Enhanced Buttons Section */}
@@ -118,8 +119,8 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
                   <FlaskConical className={`${isMobile ? 'h-5 w-5' : 'h-7 w-7'} group-hover:rotate-12 transition-transform duration-300`} />
                 </div>
                 <div className="text-left">
-                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>Modo Didáctico</div>
-                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} opacity-90 font-medium`}>Aprende sobre exoplanetas</div>
+                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>Didactic Mode</div>
+                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} opacity-90 font-medium`}>Learn about exoplanets</div>
                 </div>
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12" />
@@ -143,8 +144,8 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
                   <Telescope className={`${isMobile ? 'h-5 w-5' : 'h-7 w-7'} group-hover:rotate-12 transition-transform duration-300`} />
                 </div>
                 <div className="text-left">
-                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>Modo Profesional</div>
-                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} opacity-90 font-medium`}>Análisis con IA</div>
+                  <div className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold`}>Profesional Mode</div>
+                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} opacity-90 font-medium`}>Analysis with AI</div>
                 </div>
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12" />
@@ -160,7 +161,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           transition={{ delay: 1.8, duration: 0.8 }}
           className="text-blue-200/90 text-center mt-8 max-w-2xl mx-auto drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)]"
         >
-          Descubre cómo los científicos detectan mundos distantes usando datos reales de misiones espaciales como Kepler y TESS
+          Discover how scientists detect distant worlds using real data from space missions like Kepler and TESS
         </motion.p>
 
         {/* Info text */}
@@ -170,8 +171,8 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           transition={{ delay: 1.8, duration: 0.8 }}
           className="mt-12 text-sm text-blue-300/80 drop-shadow-[0_0_6px_rgba(0,0,0,0.8)] [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)]"
         >
-          <p>Modo Didáctico: Experimenta con parámetros interactivos</p>
-          <p>Modo Profesional: Analiza datos reales con IA</p>
+          <p>Didactic Mode: Experiment with iterative parameters</p>
+          <p>Profesional Mode: Analyze real data with AI</p>
         </motion.div>
       </div>
 

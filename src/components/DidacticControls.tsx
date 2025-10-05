@@ -93,7 +93,7 @@ export const DidacticControls = () => {
         {/* Header with tabs */}
         <div className={`${isMobile ? 'p-3' : 'p-4'} border-b border-white/10`}>
           <div className={`flex items-center justify-between ${isMobile ? 'mb-3' : 'mb-4'}`}>
-            <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold`}>Explorador Didáctico</h2>
+            <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold`}>Didactic Explorer</h2>
             <div className="flex gap-1">
               <button
                 onClick={() => setVisible(!visible)}
@@ -122,7 +122,7 @@ export const DidacticControls = () => {
               }`}
             >
               <Settings className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'} mx-auto ${isMobile ? 'mb-1' : 'mb-1'}`} />
-              Controles
+              Controls
             </button>
             <button
               onClick={() => setActiveTab('education')}
@@ -133,7 +133,7 @@ export const DidacticControls = () => {
               }`}
             >
               <BookOpen className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'} mx-auto ${isMobile ? 'mb-1' : 'mb-1'}`} />
-              Aprender
+              Learn
             </button>
             <button
               onClick={() => setActiveTab('detection')}
@@ -144,7 +144,7 @@ export const DidacticControls = () => {
               }`}
             >
               <Play className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3'} mx-auto ${isMobile ? 'mb-1' : 'mb-1'}`} />
-              Detección
+              Detection
             </button>
           </div>
         </div>
@@ -155,7 +155,7 @@ export const DidacticControls = () => {
             <div className="space-y-4">
               {/* Planet List */}
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-muted-foreground">Planetas</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground">Planets</h3>
                 {planets.map((planet) => (
                   <div
                     key={planet.id}
@@ -189,13 +189,13 @@ export const DidacticControls = () => {
                     <div className="flex items-start gap-2">
                       <Info className="h-4 w-4 mt-0.5 text-primary flex-shrink-0" />
                       <p className="text-xs text-muted-foreground">
-                        Ajusta los parámetros para ver cambios en tiempo real en la visualización 3D.
+                        Adjust the parameters to see real-time changes in the 3D visualization.
                       </p>
                     </div>
                   </div>
 
                   <ControlSlider
-                    label="Probabilidad"
+                    label="Probability"
                     value={selectedPlanet.probability || 0.5}
                     min={0}
                     max={1}
@@ -206,7 +206,7 @@ export const DidacticControls = () => {
                   />
 
                   <ControlSlider
-                    label="Radio (Tierras)"
+                    label="Radious (Earth)"
                     value={selectedPlanet.features.radius}
                     min={0.3}
                     max={10}
@@ -216,7 +216,7 @@ export const DidacticControls = () => {
                   />
 
                   <ControlSlider
-                    label="Período Orbital (días)"
+                    label="Orbital Period (days)"
                     value={selectedPlanet.features.period}
                     min={1}
                     max={1000}
@@ -226,13 +226,13 @@ export const DidacticControls = () => {
                   />
 
                   <ControlSlider
-                    label="Distancia (UA)"
+                    label="Distance (AU)"
                     value={selectedPlanet.features.distance}
                     min={1}
                     max={20}
                     step={0.5}
                     onChange={(v) => updateFeature('distance', v)}
-                    unit="UA"
+                    unit="AU"
                   />
                 </div>
               )}
@@ -250,7 +250,7 @@ export const DidacticControls = () => {
                   className="w-full justify-start bg-blue-600 hover:bg-blue-700"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
-                  ¿Qué es un Exoplaneta?
+                  What is an Exoplanet?
                 </Button>
 
                 <Button
@@ -261,7 +261,7 @@ export const DidacticControls = () => {
                   className="w-full justify-start bg-indigo-600 hover:bg-indigo-700"
                 >
                   <Info className="h-4 w-4 mr-2" />
-                  Tipos de Exoplanetas
+                  Exoplanetas types
                 </Button>
 
                 <Button
@@ -269,12 +269,12 @@ export const DidacticControls = () => {
                   className="w-full justify-start bg-purple-600 hover:bg-purple-700"
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Métodos de Detección
+                  Detection Methods
                 </Button>
 
                 <div className="space-y-2">
                   <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Métodos Específicos
+                    Specific Methods
                   </h4>
                   
                   <Button
@@ -285,7 +285,7 @@ export const DidacticControls = () => {
                     size="sm"
                   >
                     <Play className="h-3 w-3 mr-2" />
-                    Método de Tránsito
+                    Transit Method
                   </Button>
 
                   <Button
@@ -297,7 +297,7 @@ export const DidacticControls = () => {
                     size="sm"
                   >
                     <Settings className="h-3 w-3 mr-2" />
-                    Velocidad Radial
+                    Radial Speed
                   </Button>
 
                   <Button
@@ -309,7 +309,7 @@ export const DidacticControls = () => {
                     size="sm"
                   >
                     <BookOpen className="h-3 w-3 mr-2" />
-                    Microlente Gravitacional
+                    Gravitational Microlensing
                   </Button>
                 </div>
 
@@ -317,13 +317,13 @@ export const DidacticControls = () => {
                   <h4 className="font-semibold mb-2 text-sm">Datos del Planeta Seleccionado</h4>
                   {selectedPlanet ? (
                     <div className="space-y-1 text-xs">
-                      <div>Radio: {selectedPlanet.features.radius.toFixed(1)} R⊕</div>
-                      <div>Período: {selectedPlanet.features.period} días</div>
-                      <div>Distancia: {selectedPlanet.features.distance} UA</div>
-                      <div>Probabilidad: {((selectedPlanet.probability || 0.5) * 100).toFixed(0)}%</div>
+                      <div>Radious: {selectedPlanet.features.radius.toFixed(1)} R⊕</div>
+                      <div>Period: {selectedPlanet.features.period} días</div>
+                      <div>Distance: {selectedPlanet.features.distance} UA</div>
+                      <div>Probability: {((selectedPlanet.probability || 0.5) * 100).toFixed(0)}%</div>
                     </div>
                   ) : (
-                    <p className="text-xs text-muted-foreground">Selecciona un planeta</p>
+                    <p className="text-xs text-muted-foreground">Select a planet</p>
                   )}
                 </div>
               </div>
@@ -335,10 +335,10 @@ export const DidacticControls = () => {
               <div className="glass-panel p-4 rounded-lg bg-primary/10 border-primary/30">
                 <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
                   <Play className="h-4 w-4 text-primary" />
-                  Métodos de Detección
+                  Detection Methods
                 </h4>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Explora cómo los científicos detectan exoplanetas usando diferentes técnicas.
+                  Explore how scientists detect exoplanets using different techniques.
                 </p>
               </div>
 
@@ -348,7 +348,7 @@ export const DidacticControls = () => {
                   className="w-full justify-start bg-blue-600 hover:bg-blue-700"
                 >
                   <Eye className="h-4 w-4 mr-2" />
-                  Método de Tránsito
+                  Transit Method
                 </Button>
 
                 <Button
@@ -359,7 +359,7 @@ export const DidacticControls = () => {
                   className="w-full justify-start bg-green-600 hover:bg-green-700"
                 >
                   <Activity className="h-4 w-4 mr-2" />
-                  Velocidad Radial
+                  Radial Speed
                 </Button>
 
                 <Button
@@ -370,18 +370,18 @@ export const DidacticControls = () => {
                   className="w-full justify-start bg-purple-600 hover:bg-purple-700"
                 >
                   <Zap className="h-4 w-4 mr-2" />
-                  Microlente Gravitacional
+                  Gravitational Microlensing
                 </Button>
               </div>
 
               {selectedPlanet && (
                 <div className="glass-panel p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2 text-sm">Análisis del Planeta</h4>
+                  <h4 className="font-semibold mb-2 text-sm">Planeta Analysis</h4>
                   <div className="space-y-1 text-xs">
-                    <div>Profundidad de Tránsito: ~{(selectedPlanet.features.radius * selectedPlanet.features.radius * 100).toFixed(0)} ppm</div>
-                    <div>Duración: ~{(selectedPlanet.features.radius * 2).toFixed(1)} horas</div>
-                    <div>Tipo: {selectedPlanet.features.radius < 1.5 ? 'Rocoso' : selectedPlanet.features.radius < 4 ? 'Neptuno' : 'Gigante Gaseoso'}</div>
-                    <div>Detectabilidad: {selectedPlanet.probability && selectedPlanet.probability > 0.7 ? 'Alta' : selectedPlanet.probability && selectedPlanet.probability > 0.4 ? 'Media' : 'Baja'}</div>
+                    <div>Transit Depth: ~{(selectedPlanet.features.radius * selectedPlanet.features.radius * 100).toFixed(0)} ppm</div>
+                    <div>Duration: ~{(selectedPlanet.features.radius * 2).toFixed(1)} hours</div>
+                    <div>Type: {selectedPlanet.features.radius < 1.5 ? 'Rocoso' : selectedPlanet.features.radius < 4 ? 'Neptuno' : 'Gigante Gaseoso'}</div>
+                    <div>Detectability: {selectedPlanet.probability && selectedPlanet.probability > 0.7 ? 'Alta' : selectedPlanet.probability && selectedPlanet.probability > 0.4 ? 'Media' : 'Baja'}</div>
                   </div>
                 </div>
               )}

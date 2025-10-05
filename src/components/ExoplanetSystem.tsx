@@ -149,7 +149,7 @@ export const ExoplanetSystem = ({
               className={`${isMobile ? 'w-full' : ''} touch-manipulation`}
             >
               <PauseCircle className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
-              {paused ? 'Reanudar' : 'Pausar'}
+              {paused ? 'Play' : 'Stop'}
             </Button>
             <Button
               variant={'ghost'}
@@ -158,7 +158,7 @@ export const ExoplanetSystem = ({
               className={`${isMobile ? 'w-full' : ''} touch-manipulation`}
             >
               <RefreshCcw className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
-              Reiniciar órbitas
+              Reset Orbits
             </Button>
             <Button
               variant={realisticMode ? 'default' : 'ghost'}
@@ -167,7 +167,7 @@ export const ExoplanetSystem = ({
               className={`${isMobile ? 'w-full' : ''} touch-manipulation`}
             >
               <Sparkles className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 mr-2'}`} />
-              {realisticMode ? 'Modo realista' : 'Modo simplificado'}
+              {realisticMode ? 'Realistic mode' : 'Simplified mode'}
             </Button>
           </div>
         </div>

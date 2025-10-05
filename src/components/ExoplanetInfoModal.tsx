@@ -127,141 +127,142 @@ type ModalContentMap = {
 
 const modalContent: ModalContentMap = {
   'what-is-exoplanet': {
-    title: '¿Qué es un Exoplaneta?',
+    title: 'What is an Exoplanet?',
     icon: Globe,
     illustration: ExoplanetSystemSVG,
     content: [
       {
-        subtitle: 'Definición',
-        text: 'Un exoplaneta es un planeta que orbita una estrella diferente al Sol. También se les conoce como planetas extrasolares. Estos mundos distantes pueden ser muy diferentes a los planetas de nuestro sistema solar.',
+        subtitle: 'Definition',
+        text: 'An exoplanet is a planet that orbits a star other than the Sun. They are also known as extrasolar planets. These distant worlds can be very different from the planets in our solar system.',
       },
       {
-        subtitle: 'Diversidad de Mundos',
-        text: 'Los exoplanetas presentan una increíble diversidad: desde súper-Tierras rocosas hasta gigantes gaseosos más grandes que Júpiter, pasando por mundos oceánicos y planetas con atmósferas exóticas.',
+        subtitle: 'Diversity of Worlds',
+        text: 'Exoplanets exhibit an incredible diversity: from rocky super-Earths to gas giants larger than Jupiter, including ocean worlds and planets with exotic atmospheres.',
       },
       {
-        subtitle: 'Zona Habitable',
-        text: 'Algunos exoplanetas se encuentran en la "zona habitable" de su estrella, donde las temperaturas permiten la existencia de agua líquida en superficie, un ingrediente clave para la vida tal como la conocemos.',
+        subtitle: 'Habitable Zone',
+        text: 'Some exoplanets are located in the "habitable zone" of their star, where temperatures allow the presence of liquid water on the surface, a key ingredient for life as we know it.',
       },
       {
-        subtitle: 'Descubrimientos Históricos',
-        text: 'Hasta la fecha se han confirmado más de 5,400 exoplanetas en más de 4,000 sistemas estelares. El primer exoplaneta alrededor de una estrella similar al Sol fue 51 Pegasi b, descubierto en 1995.',
+        subtitle: 'Historical Discoveries',
+        text: 'To date, more than 5,400 exoplanets have been confirmed in over 4,000 star systems. The first exoplanet around a Sun-like star was 51 Pegasi b, discovered in 1995.',
       },
     ],
   },
   'planet-types': {
-    title: 'Tipos de Exoplanetas',
+    title: 'Tipos de Exoplanet Types',
     icon: Star,
     illustration: PlanetTypesSVG,
     content: [
       {
-        subtitle: 'Planetas Rocosos',
-        text: 'Similares a la Tierra y Marte, estos planetas tienen superficies sólidas compuestas principalmente de roca y metal. Las súper-Tierras son planetas rocosos más grandes que la Tierra.',
+        subtitle: 'Rocky Planets',
+        text: 'Similar to Earth and Mars, these planets have solid surfaces made primarily of rock and metal. Super-Earths are rocky planets larger than Earth.',
       },
       {
-        subtitle: 'Gigantes Gaseosos',
-        text: 'Planetas masivos compuestos principalmente de hidrógeno y helio, como Júpiter y Saturno. Los "Júpiteres calientes" orbitan muy cerca de sus estrellas.',
+        subtitle: 'Gas Giants',
+        text: 'Massive planets composed mainly of hydrogen and helium, like Jupiter and Saturn. "Hot Jupiters" orbit very close to their stars.',
       },
       {
-        subtitle: 'Mundos Helados',
-        text: 'Planetas fríos con superficies cubiertas de hielo, similares a Europa o Encélado. Algunos pueden tener océanos subterráneos bajo su corteza helada.',
+        subtitle: 'Ice Worlds',
+        text: 'Cold planets with surfaces covered in ice, similar to Europa or Enceladus. Some may have underground oceans beneath their icy crust.',
       },
       {
-        subtitle: 'Planetas Oceánicos',
-        text: 'Mundos completamente cubiertos por océanos profundos, sin continentes visibles. Estos planetas podrían albergar formas de vida acuática.',
+        subtitle: 'Ocean Worlds',
+        text: 'Worlds completely covered by deep oceans, with no visible continents. These planets could harbor aquatic forms of life.',
       },
     ],
   },
   'detection-methods': {
-    title: 'Métodos de Detección',
+    title: 'Detection Methods',
     icon: Telescope,
     content: [
       {
-        subtitle: 'Método de Tránsito (85%)',
-        text: 'El método más exitoso. Detecta la disminución periódica del brillo estelar cuando un planeta pasa frente a su estrella. Misiones como Kepler y TESS han revolucionado este campo.',
+        subtitle: 'Transit Method (85%)',
+        text: 'The most successful method. It detects the periodic dimming of a star’s brightness when a planet passes in front of it. Missions like Kepler and TESS have revolutionized this field.',
       },
       {
-        subtitle: 'Velocidad Radial (12%)',
-        text: 'Mide el "bamboleo" gravitacional de una estrella causado por un planeta en órbita. Detecta cambios en el espectro estelar debido al efecto Doppler.',
+        subtitle: 'Radial Velocity (12%)',
+        text: 'It measures the gravitational "wobble" of a star caused by an orbiting planet. It detects changes in the stellar spectrum due to the Doppler effect.',
       },
       {
-        subtitle: 'Imagen Directa (1%)',
-        text: 'Captura fotografías directas de exoplanetas, generalmente gigantes gaseosos jóvenes y calientes que orbitan lejos de estrellas brillantes.',
+        subtitle: 'Direct Imaging (1%)',
+        text: 'It captures direct photographs of exoplanets, usually young and hot gas giants orbiting far from bright stars.',
       },
       {
-        subtitle: 'Microlente Gravitacional (2%)',
-        text: 'Utiliza el efecto de lente gravitacional cuando un sistema planetario pasa frente a una estrella distante, amplificando temporalmente su luz.',
+        subtitle: 'Gravitational Microlensing (2%)',
+        text: 'It uses the gravitational lensing effect when a planetary system passes in front of a distant star, temporarily amplifying its light.',
       },
     ],
   },
   'transit-method': {
-    title: 'Método de Tránsito',
+    title: 'Transit Method',
     icon: Eye,
     illustration: TransitMethodSVG,
     content: [
       {
-        subtitle: 'Principio Físico',
-        text: 'Cuando un planeta pasa frente a su estrella desde nuestra perspectiva, bloquea una pequeña fracción de la luz estelar, creando un eclipse parcial que podemos detectar.',
+        subtitle: 'Physical Principle',
+        text: 'When a planet passes in front of its star from our perspective, it blocks a small fraction of the starlight, creating a partial eclipse that we can detect.',
       },
       {
-        subtitle: 'Curva de Luz',
-        text: 'La disminución del brillo se registra como una "curva de luz" que muestra una caída característica en forma de U. La profundidad del tránsito revela el tamaño del planeta.',
+        subtitle: 'Light Curve',
+        text: 'The decrease in brightness is recorded as a "light curve" showing a characteristic U-shaped dip. The transit depth reveals the size of the planet.',
       },
       {
-        subtitle: 'Información Derivada',
-        text: 'Del análisis del tránsito obtenemos: radio del planeta, período orbital, inclinación de la órbita, y con múltiples tránsitos, podemos estudiar la atmósfera planetaria.',
+        subtitle: 'Derived Information',
+        text: 'From transit analysis we obtain: planet radius, orbital period, orbit inclination, and with multiple transits, we can study the planetary atmosphere.',
       },
       {
-        subtitle: 'Limitaciones',
-        text: 'Solo detecta planetas cuyas órbitas están alineadas con nuestra línea de visión. La probabilidad de alineación es mayor para planetas cercanos a su estrella.',
+        subtitle: 'Limitations',
+        text: 'It only detects planets whose orbits are aligned with our line of sight. The probability of alignment is higher for planets closer to their star.',
       },
     ],
   },
   'radial-velocity': {
-    title: 'Velocidad Radial',
+    title: 'Radial Velocity',
     icon: Waves,
     illustration: RadialVelocitySVG,
     content: [
       {
-        subtitle: 'Efecto Doppler',
-        text: 'Un planeta en órbita hace que su estrella se "bambolee" ligeramente. Este movimiento causa cambios en el espectro estelar debido al efecto Doppler: azul cuando se acerca, rojo cuando se aleja.',
+        subtitle: 'Doppler Effect',
+        text: 'An orbiting planet causes its star to "wobble" slightly. This movement causes changes in the stellar spectrum due to the Doppler effect: blue when approaching, red when receding.',
       },
       {
-        subtitle: 'Medición Precisa',
-        text: 'Los espectrógrafos modernos pueden detectar cambios de velocidad de apenas 1 metro por segundo, equivalente a la velocidad de una persona caminando.',
+        subtitle: 'Precise Measurement',
+        text: 'Modern spectrographs can detect velocity changes of just 1 meter per second, equivalent to the speed of a walking person.',
       },
       {
-        subtitle: 'Masa Planetaria',
-        text: 'Este método permite determinar la masa mínima del planeta. Planetas más masivos causan bamboleos más pronunciados en su estrella.',
+        subtitle: 'Planetary Mass',
+        text: 'This method allows determination of the planet’s minimum mass. More massive planets cause more pronounced wobbles in their star.',
       },
       {
-        subtitle: 'Sesgo de Detección',
-        text: 'Favorece la detección de planetas masivos en órbitas cercanas. Los primeros exoplanetas descubiertos fueron "Júpiteres calientes" por esta razón.',
+        subtitle: 'Detection Bias',
+        text: 'Favors detection of massive planets in close orbits. The first exoplanets discovered were "hot Jupiters" for this reason.',
       },
     ],
   },
   'microlensing': {
-    title: 'Microlente Gravitacional',
+    title: 'Gravitational Microlensing',
     icon: Search,
     content: [
       {
-        subtitle: 'Relatividad General',
-        text: 'Basado en la predicción de Einstein: la gravedad curva el espacio-tiempo. Una estrella con planetas actúa como una lente gravitacional, amplificando la luz de una estrella más distante.',
+        subtitle: 'General Relativity',
+        text: 'Based on Einstein’s prediction: gravity curves space-time. A star with planets acts as a gravitational lens, amplifying the light of a more distant star.',
       },
       {
-        subtitle: 'Eventos Únicos',
-        text: 'Cada evento de microlente es único e irrepetible, durando desde días hasta meses. La presencia de un planeta crea una anomalía característica en la curva de amplificación.',
+        subtitle: 'Unique Events',
+        text: 'Each microlensing event is unique and unrepeatable, lasting from days to months. The presence of a planet creates a characteristic anomaly in the amplification curve.',
       },
       {
-        subtitle: 'Planetas Lejanos',
-        text: 'Único método capaz de detectar planetas a grandes distancias de la Tierra, incluso en el centro galáctico. Puede encontrar planetas de baja masa y planetas "flotantes" sin estrella.',
+        subtitle: 'Distant Planets',
+        text: 'The only method capable of detecting planets at great distances from Earth, even in the galactic center. It can find low-mass planets and "free-floating" planets without a star.',
       },
       {
-        subtitle: 'Desafíos',
-        text: 'Requiere monitoreo continuo del cielo y no permite estudios de seguimiento del mismo planeta. Los eventos son impredecibles y no repetibles.',
+        subtitle: 'Challenges',
+        text: 'Requires continuous sky monitoring and does not allow follow-up studies of the same planet. Events are unpredictable and not repeatable.',
       },
     ],
   },
+
 };
 
 export const ExoplanetInfoModal = ({ isOpen, onClose, topic }: ExoplanetInfoModalProps) => {
@@ -343,7 +344,7 @@ export const ExoplanetInfoModal = ({ isOpen, onClose, topic }: ExoplanetInfoModa
             <div className="p-6 border-t border-gray-700">
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <Zap className="w-4 h-4" />
-                <span>Explora la visualización 3D para aprender más</span>
+                <span>Explore the 3D visualization to learn more</span>
               </div>
             </div>
           </motion.div>

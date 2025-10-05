@@ -219,9 +219,9 @@ export const PlanetParameterSliders = ({
       <div className="p-4 border-t border-gray-700">
         <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
           <p className="text-xs text-blue-200 leading-relaxed">
-            <strong>Tip:</strong> Ajusta los parámetros para ver cómo afectan 
-            la curva de luz del tránsito. Planetas más grandes crean dips más profundos, 
-            mientras que órbitas más cercanas tienen períodos más cortos.
+            <strong>Tip:</strong> Adjust the parameters to see how 
+            they affect the transit light curve. Larger planets create deeper dips,
+             while closer orbits have shorter periods.
           </p>
         </div>
       </div>

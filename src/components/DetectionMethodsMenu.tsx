@@ -170,14 +170,14 @@ const MicrolensingAnimation = ({ isActive }: { isActive: boolean }) => {
 const detectionMethods: DetectionMethod[] = [
   {
     id: 'transit',
-    name: 'Método de Tránsito',
+    name: 'Transit Method',
     icon: Eye,
-    description: 'Detecta planetas cuando pasan frente a su estrella',
+    description: 'Detects planets when they pass in front of their star',
     details: [
-      'Mide la disminución del brillo estelar (0.01-1%)',
-      'Permite determinar el tamaño y órbita del planeta',
-      'Método más exitoso: >75% de exoplanetas conocidos',
-      'Usado por misiones como Kepler, TESS y James Webb'
+      'Measures the decrease in starlight (0.01-1%)',
+      'Allows determination of planet size and orbit',
+      'Most successful method: >75% of known exoplanets',
+      'Used by missions like Kepler, TESS, and James Webb'
     ],
     color: 'text-blue-400',
     bgColor: 'bg-blue-500/20',
@@ -185,19 +185,19 @@ const detectionMethods: DetectionMethod[] = [
     stats: {
       discovered: 3800,
       percentage: 76,
-      sensitivity: 'Planetas grandes y cercanos'
+      sensitivity: 'Large and close planets'
     }
   },
   {
     id: 'radial-velocity',
-    name: 'Velocidad Radial',
+    name: 'Radial Velocity',
     icon: Activity,
-    description: 'Detecta el "bamboleo" de la estrella por la gravedad del planeta',
+    description: 'Detects the star’s "wobble" caused by the planet’s gravity',
     details: [
-      'Mide cambios Doppler en el espectro estelar',
-      'Permite determinar la masa mínima del planeta',
-      'Primer método exitoso (51 Pegasi b, 1995)',
-      'Precisión hasta 1 m/s en velocidad estelar'
+      'Measures Doppler shifts in the stellar spectrum',
+      'Allows determination of the planet’s minimum mass',
+      'First successful method (51 Pegasi b, 1995)',
+      'Precision up to 1 m/s in stellar velocity'
     ],
     color: 'text-green-400',
     bgColor: 'bg-green-500/20',
@@ -205,19 +205,19 @@ const detectionMethods: DetectionMethod[] = [
     stats: {
       discovered: 950,
       percentage: 19,
-      sensitivity: 'Planetas masivos y cercanos'
+      sensitivity: 'Massive and close planets'
     }
   },
   {
     id: 'microlensing',
-    name: 'Microlente Gravitacional',
+    name: 'Gravitational Microlensing',
     icon: Zap,
-    description: 'Usa el efecto de lente gravitacional para detectar planetas',
+    description: 'Uses the gravitational lensing effect to detect planets',
     details: [
-      'Amplifica la luz de estrellas de fondo',
-      'Detecta planetas únicos y muy distantes',
-      'Sensible a planetas de masa terrestre',
-      'Eventos únicos e irrepetibles'
+      'Amplifies light from background stars',
+      'Detects unique and very distant planets',
+      'Sensitive to Earth-mass planets',
+      'Unique and unrepeatable events'
     ],
     color: 'text-purple-400',
     bgColor: 'bg-purple-500/20',
@@ -225,7 +225,7 @@ const detectionMethods: DetectionMethod[] = [
     stats: {
       discovered: 180,
       percentage: 3.6,
-      sensitivity: 'Planetas fríos y lejanos'
+      sensitivity: 'Cold and distant planets'
     }
   }
 ];
@@ -302,7 +302,7 @@ export const DetectionMethodsMenu = ({
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-xl font-bold text-white">
-                    Métodos de Detección
+                    Detection Methods
                   </h2>
                   <motion.button
                     onClick={() => setAutoPlay(!autoPlay)}
@@ -319,22 +319,22 @@ export const DetectionMethodsMenu = ({
                 </div>
                 
                 <p className="text-sm text-gray-400 mb-4">
-                  Explora las diferentes técnicas para encontrar exoplanetas
+                  Explore the different techniques for finding exoplanets
                 </p>
 
                 {/* Global Statistics */}
                 <div className="bg-gray-800/50 rounded-lg p-3 mb-4">
                   <h3 className="text-sm font-semibold text-white mb-2">
-                    Exoplanetas Confirmados
+                    Confirmed Exoplanets
                   </h3>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
                       <div className="text-2xl font-bold text-blue-400">5,000+</div>
-                      <div className="text-gray-400">Total descubiertos</div>
+                      <div className="text-gray-400">Total Discovered</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-green-400">4,000+</div>
-                      <div className="text-gray-400">Sistemas planetarios</div>
+                      <div className="text-gray-400">Planetary Systems</div>
                     </div>
                   </div>
                 </div>
@@ -420,18 +420,18 @@ export const DetectionMethodsMenu = ({
                                     <div className={`text-lg font-bold ${method.color}`}>
                                       {method.stats.discovered.toLocaleString()}
                                     </div>
-                                    <div className="text-gray-400">Descubiertos</div>
+                                    <div className="text-gray-400">Discovered</div>
                                   </div>
                                   <div>
                                     <div className={`text-lg font-bold ${method.color}`}>
                                       {method.stats.percentage}%
                                     </div>
-                                    <div className="text-gray-400">Del total</div>
+                                    <div className="text-gray-400">Of the total</div>
                                   </div>
                                 </div>
                                 <div className="mt-2 pt-2 border-t border-gray-700">
                                   <div className="text-xs text-gray-400">
-                                    <span className="font-medium">Sensibilidad:</span> {method.stats.sensitivity}
+                                    <span className="font-medium">Sensibility:</span> {method.stats.sensitivity}
                                   </div>
                                 </div>
                               </motion.div>
@@ -498,7 +498,7 @@ export const DetectionMethodsMenu = ({
                                     className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-700/50 text-gray-400 rounded-lg text-sm border border-gray-600"
                                   >
                                     <Search className="w-4 h-4" />
-                                    Simulación completa próximamente
+                                    Full simulation coming soon
                                   </motion.div>
                                 )}
                               </div>
@@ -522,7 +522,7 @@ export const DetectionMethodsMenu = ({
                 >
                   <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                     <Waves className="w-4 h-4 text-blue-400" />
-                    Progreso de Detección
+                    Detection Progress
                   </h4>
                   <div className="space-y-2">
                     {detectionMethods.map((method, index) => (
@@ -555,13 +555,13 @@ export const DetectionMethodsMenu = ({
                 >
                   <h4 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
                     <Info className="w-4 h-4 text-yellow-400" />
-                    ¿Sabías que...?
+                    Did You Know That ...?
                   </h4>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    El primer exoplaneta confirmado alrededor de una estrella similar al Sol fue 
-                    <span className="text-blue-400 font-medium"> 51 Pegasi b</span> en 1995, 
-                    descubierto usando el método de velocidad radial. Desde entonces, hemos 
-                    encontrado más de 5,000 mundos extrasolares.
+                    The first confirmed exoplanet around a Sun-like star was
+                    <span className="text-blue-400 font-medium"> 51 Pegasi b</span> in 1995, 
+                    discovered using the radial velocity method. 
+                    Since then, we have found more than 5,000 extrasolar worlds.
                   </p>
                 </motion.div>
 
@@ -579,7 +579,7 @@ export const DetectionMethodsMenu = ({
                         animate={{ scale: [1, 1.2, 1] }}
                         transition={{ duration: 1, repeat: Infinity }}
                       />
-                      Modo automático activo
+                      Automatic mode active
                     </div>
                   </motion.div>
                 )}

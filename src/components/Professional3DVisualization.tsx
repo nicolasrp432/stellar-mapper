@@ -107,11 +107,11 @@ const AsteroidObject = ({ planetData }: { planetData: PlanetData }) => {
       <Html position={[0, size + 0.8, 0]} center>
         <div className="bg-red-900/90 text-red-100 px-3 py-2 rounded-lg text-sm font-medium shadow-lg border border-red-700/50">
           <div className="text-center">
-            <div className="font-bold">Falso Positivo</div>
-            <div className="text-xs mt-1 opacity-80">Asteroide o Roca Espacial</div>
+            <div className="font-bold">False Positive</div>
+            <div className="text-xs mt-1 opacity-80">Asteroid or Space Rock</div>
             <div className="text-xs mt-2 space-y-1">
-              <div>Probabilidad: {Math.round((planetData.probability || 0) * 100)}%</div>
-              <div>Tamaño: {planetData.features.radius.toFixed(1)} R⊕</div>
+              <div>Probability: {Math.round((planetData.probability || 0) * 100)}%</div>
+              <div>Size: {planetData.features.radius.toFixed(1)} R⊕</div>
             </div>
           </div>
         </div>
@@ -518,13 +518,13 @@ const ExoplanetObject = ({ planetData }: { planetData: PlanetData }) => {
       <Html position={[0, radius + 1.2, 0]} center>
         <div className="bg-green-900/90 text-green-100 px-4 py-3 rounded-lg text-sm font-medium shadow-lg border border-green-700/50">
           <div className="text-center">
-            <div className="font-bold text-green-300">✓ Exoplaneta Confirmado</div>
+            <div className="font-bold text-green-300">✓ Confirmed Exoplanet</div>
             <div className="text-sm mt-1">{getTypeDescription()}</div>
             <div className="text-xs mt-3 space-y-1 text-left">
-              <div><span className="font-semibold">Probabilidad:</span> {Math.round((planetData.probability || 0) * 100)}%</div>
-              <div><span className="font-semibold">Radio:</span> {planetData.features.radius.toFixed(1)} R⊕</div>
-              <div><span className="font-semibold">Período:</span> {planetData.features.period.toFixed(1)} días</div>
-              <div><span className="font-semibold">Distancia:</span> {planetData.features.distance.toFixed(1)} UA</div>
+              <div><span className="font-semibold">Probability:</span> {Math.round((planetData.probability || 0) * 100)}%</div>
+              <div><span className="font-semibold">Radious:</span> {planetData.features.radius.toFixed(1)} R⊕</div>
+              <div><span className="font-semibold">Period:</span> {planetData.features.period.toFixed(1)} días</div>
+              <div><span className="font-semibold">Distance:</span> {planetData.features.distance.toFixed(1)} UA</div>
             </div>
           </div>
         </div>
@@ -577,9 +577,9 @@ export const Professional3DVisualization = ({ planetData }: Professional3DVisual
       {/* Controles de ayuda */}
       <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg p-2 text-white text-xs">
         <div className="space-y-1">
-          <div>🖱️ Clic y arrastra: Rotar</div>
+          <div>🖱️ Click and drag: Rotate</div>
           <div>🔍 Scroll: Zoom</div>
-          <div>⚡ Clic derecho: Mover</div>
+          <div>⚡ Right Clic: Move</div>
         </div>
       </div>
     </div>

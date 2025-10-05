@@ -20,7 +20,7 @@ export const Header = ({ onBackToHome, showBackButton = false }: HeaderProps) =>
             <Orbit className="h-6 w-6 text-cyan-400" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white">ExoPlanet Explorer</h1>
+            <h1 className="text-lg font-bold text-white">ExoVision</h1>
             <p className="text-xs text-gray-400">NASA Data Visualization</p>
           </div>
         </div>
@@ -33,7 +33,7 @@ export const Header = ({ onBackToHome, showBackButton = false }: HeaderProps) =>
             className="text-white hover:bg-white/10"
           >
             <Home className="h-4 w-4 mr-2" />
-            Inicio
+            Home
           </Button>
         )}
       </div>

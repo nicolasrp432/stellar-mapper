@@ -63,10 +63,10 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
             <div className="mb-8">
               <Upload className="h-16 w-16 text-primary mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-foreground mb-2">
-                Modo Profesional
+                Professional Mode
               </h2>
               <p className="text-muted-foreground">
-                Sube un archivo CSV para comenzar el análisis de candidatos a exoplanetas
+                Upload a CSV file to start the analysis of exoplanet candidates
               </p>
             </div>
             
@@ -74,10 +74,10 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
               <div className="glass-panel p-4 rounded-lg">
                 <div className="flex items-center gap-3 mb-2">
                   <FileText className="h-5 w-5 text-primary" />
-                  <span className="font-semibold">Formato CSV</span>
+                  <span className="font-semibold">CSV Format</span>
                 </div>
                 <p className="text-sm text-muted-foreground text-left">
-                  El archivo debe contener columnas para: nombre, radio, período, distancia, y probabilidad
+                  The file must contain columns for: name, radius, period, distance, and probability
                 </p>
               </div>
               
@@ -87,7 +87,7 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
                   <span className="font-semibold">Análisis Avanzado</span>
                 </div>
                 <p className="text-sm text-muted-foreground text-left">
-                  Visualización 3D realista, clasificación automática, y métricas detalladas
+                  Realistic 3D visualization, automatic classification, and detailed metrics
                 </p>
               </div>
             </div>
@@ -106,10 +106,10 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
               <div className="flex items-center gap-3 mb-6">
                 <BarChart3 className="h-5 w-5 text-primary" />
                 <h2 className="text-2xl font-bold text-foreground">
-                  Análisis de Candidatos a Exoplanetas
+                  Exoplanet Candidate Analysis
                 </h2>
                 <div className="ml-auto text-sm text-muted-foreground">
-                  {displayPlanets.length} candidatos analizados
+                  {displayPlanets.length} analized candidates
                 </div>
               </div>
 
@@ -119,19 +119,19 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
                   <div className="text-2xl font-bold text-green-400">
                     {displayPlanets.filter(p => (p.isExoplanet ?? (p.probability ?? 0) > 0.5)).length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Exoplanetas</div>
+                  <div className="text-sm text-muted-foreground">Exoplanets</div>
                 </div>
                 <div className="glass-panel p-4 rounded-lg">
                   <div className="text-2xl font-bold text-red-400">
                     {displayPlanets.filter(p => !(p.isExoplanet ?? (p.probability ?? 0) > 0.5)).length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Falsos Positivos</div>
+                  <div className="text-sm text-muted-foreground">False Positives</div>
                 </div>
                 <div className="glass-panel p-4 rounded-lg">
                   <div className="text-2xl font-bold text-primary">
                     {Math.round(displayPlanets.reduce((acc, p) => acc + (p.probability ?? 0.5), 0) / displayPlanets.length * 100)}%
                   </div>
-                  <div className="text-sm text-muted-foreground">Confianza Promedio</div>
+                  <div className="text-sm text-muted-foreground">Average Confidence</div>
                 </div>
               </div>
 
@@ -165,7 +165,7 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
                       
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-300">Probabilidad</span>
+                          <span className="text-xs text-gray-300">Probability</span>
                           <span className={`text-sm font-bold ${isExoplanet ? 'text-green-400' : 'text-red-400'}`}>
                             {Math.round((planet.probability ?? 0.5) * 100)}%
                           </span>
@@ -181,8 +181,8 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
                         </div>
                         
                         <div className="text-xs text-gray-400 mt-2">
-                          <div>Radio: {planet.features.radius.toFixed(1)} R⊕</div>
-                          <div>Período: {planet.features.period.toFixed(1)} días</div>
+                          <div>Radious: {planet.features.radius.toFixed(1)} R⊕</div>
+                          <div>Period: {planet.features.period.toFixed(1)} días</div>
                         </div>
                         
                         <div className={`text-xs font-medium mt-2 ${isExoplanet ? 'text-green-400' : 'text-red-400'}`}>
