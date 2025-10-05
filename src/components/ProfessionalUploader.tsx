@@ -1,10 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Download, Send, Check, X, FileText, AlertCircle, CheckCircle, Info } from 'lucide-react';
-import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { usePlanetsStore } from '@/hooks/usePlanetsStore';
-import { CSVMapping, AnalyzeResponse } from '@/types/exoplanet';
+import { CSVMapping } from '@/types/exoplanet';
 import { useToast } from '@/hooks/use-toast';
 
 const AVAILABLE_FIELDS = [
@@ -228,22 +227,47 @@ export const ProfessionalUploader = ({
 
     setLoading(true);
     try {
-      const response = await axios.post<AnalyzeResponse>(endpoint, {
-        arrayPosicion: mappings,
-        csvData: csvData,
-      });
+      // Simulación del procesamiento de CSV
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Generar datos simulados basados en el CSV cargado
+      const simulatedResults = csvData.slice(1).map((row, index) => {
+        const baseNames = [
+          'Kepler-22b', 'KOI-351c', 'HD 209458 b', 'GJ 436 b', 'WASP-12b',
+          'TOI-700d', 'K2-18b', 'Kepler-9b', 'TESS-1013', 'KIC-8462852'
+        ];
+        
+        // Generar probabilidad aleatoria pero realista
+        const probability = Math.random() * 0.8 + 0.2; // Entre 0.2 y 1.0
+        const isExoplanet = probability > 0.5;
+        
+        return {
+          id: `sim-${index + 1}`,
+          name: baseNames[index % baseNames.length] || `Candidato-${index + 1}`,
+          probability,
+          isExoplanet,
+          features: {
+            radius: Math.random() * 3 + 0.5, // 0.5 - 3.5 radios terrestres
+            period: Math.random() * 500 + 1, // 1 - 500 días
+            distance: Math.random() * 10 + 0.5, // 0.5 - 10.5 UA
+            depth: Math.random() * 800 + 50, // 50 - 850 ppm
+            duration: Math.random() * 8 + 1, // 1 - 9 horas
+            snr: Math.random() * 20 + 2 // 2 - 22
+          }
+        };
+      }).slice(0, 10); // Limitar a 10 resultados
 
-      setPlanets(response.data.planets || []);
+      setPlanets(simulatedResults);
       onDataUploaded?.();
       toast({
-        title: 'Analysis Complete',
-        description: `Detected ${response.data.planets?.length || 0} exoplanet candidates.`,
+        title: 'Análisis Completado',
+        description: `Se detectaron ${simulatedResults.length} candidatos a exoplanetas.`,
       });
     } catch (error) {
-      console.error('Error submitting data:', error);
+      console.error('Error simulating data:', error);
       toast({
-        title: 'Analysis Failed',
-        description: 'Could not process the data. Please check your endpoint and data format.',
+        title: 'Error en la Simulación',
+        description: 'No se pudo procesar los datos. Inténtalo de nuevo.',
         variant: 'destructive',
       });
     } finally {

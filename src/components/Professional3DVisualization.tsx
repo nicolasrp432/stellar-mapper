@@ -1,684 +1,309 @@
 import { useRef, useMemo, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Stars, Text, Html, Sphere, Ring } from '@react-three/drei';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { PlanetData } from '@/types/exoplanet';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Professional3DVisualizationProps {
   planetData: PlanetData;
 }
 
-// Enhanced planet type classification
-const getPlanetType = (planetData: PlanetData): 'rocky' | 'gas' | 'ice' | 'super-earth' => {
-  const radius = planetData.features.radius;
-  const distance = planetData.features.distance;
-  
-  if (radius < 1.25) return 'rocky';
-  if (radius < 2) return 'super-earth';
-  if (distance > 5 || radius < 4) return 'ice';
-  return 'gas';
-};
-
-const ProfessionalPlanet = ({ planetData }: { planetData: PlanetData }) => {
+// Componente para asteroides/rocas (falsos positivos)
+const AsteroidObject = ({ planetData }: { planetData: PlanetData }) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const atmosphereRef = useRef<THREE.Mesh>(null);
-  const ringsRef = useRef<THREE.Group>(null);
   const [isHovered, setIsHovered] = useState(false);
   
-  const isExoplanet = planetData.isExoplanet ?? (planetData.probability ?? 0) > 0.5;
-  const radius = Math.max(0.5, Math.min(3, planetData.features.radius * 0.25));
-  const planetType = useMemo(() => getPlanetType(planetData), [planetData]);
+  const size = Math.max(0.4, Math.min(1.2, planetData.features.radius * 0.2));
   
-  // Enhanced planet texture creation
-  const { planetTexture, normalMap, emissiveMap } = useMemo(() => {
-    // Main texture
+  // Crear textura rugosa para asteroide
+  const asteroidTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 512;
+    canvas.width = 256;
+    canvas.height = 256;
     const ctx = canvas.getContext('2d')!;
     
-    // Noise function for realistic patterns
-    const noise = (x: number, y: number, scale: number = 1) => {
-      const nx = x * scale;
-      const ny = y * scale;
-      return (Math.sin(nx * 0.1) + Math.sin(ny * 0.1) + Math.sin((nx + ny) * 0.05)) / 3;
-    };
-    
-    const imageData = ctx.createImageData(1024, 512);
+    const imageData = ctx.createImageData(256, 256);
     const data = imageData.data;
     
-    for (let y = 0; y < 512; y++) {
-      for (let x = 0; x < 1024; x++) {
-        const index = (y * 1024 + x) * 4;
-        const noiseValue = noise(x, y, 0.01) * 0.5 + 0.5;
-        const detailNoise = noise(x, y, 0.05) * 0.3 + 0.7;
+    for (let y = 0; y < 256; y++) {
+      for (let x = 0; x < 256; x++) {
+        const index = (y * 256 + x) * 4;
+        const noise = Math.random() * 0.5 + 0.3;
+        
+        // Colores grises/marrones para asteroide
+        data[index] = Math.floor((70 + Math.random() * 50) * noise);     // R
+        data[index + 1] = Math.floor((50 + Math.random() * 40) * noise); // G
+        data[index + 2] = Math.floor((30 + Math.random() * 30) * noise); // B
+        data[index + 3] = 255; // A
+      }
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+  }, []);
+  
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x += 0.008;
+      meshRef.current.rotation.y += 0.012;
+      meshRef.current.rotation.z += 0.005;
+    }
+  });
+  
+  return (
+    <group>
+      <mesh
+        ref={meshRef}
+        onPointerOver={() => setIsHovered(true)}
+        onPointerOut={() => setIsHovered(false)}
+        scale={isHovered ? 1.15 : 1}
+      >
+        {/* Forma irregular para asteroide */}
+        <dodecahedronGeometry args={[size, 1]} />
+        <meshStandardMaterial
+          map={asteroidTexture}
+          roughness={0.95}
+          metalness={0.05}
+          color="#654321"
+        />
+      </mesh>
+      
+      {/* Información del objeto */}
+      <Html position={[0, size + 0.8, 0]} center>
+        <div className="bg-red-900/90 text-red-100 px-3 py-2 rounded-lg text-sm font-medium shadow-lg border border-red-700/50">
+          <div className="text-center">
+            <div className="font-bold">Falso Positivo</div>
+            <div className="text-xs mt-1 opacity-80">Asteroide o Roca Espacial</div>
+            <div className="text-xs mt-2 space-y-1">
+              <div>Probabilidad: {Math.round((planetData.probability || 0) * 100)}%</div>
+              <div>Tamaño: {planetData.features.radius.toFixed(1)} R⊕</div>
+            </div>
+          </div>
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// Componente para exoplanetas (detallado)
+const ExoplanetObject = ({ planetData }: { planetData: PlanetData }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const atmosphereRef = useRef<THREE.Mesh>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const radius = Math.max(0.6, Math.min(2.5, planetData.features.radius * 0.3));
+  
+  // Determinar tipo de planeta
+  const planetType = useMemo(() => {
+    const r = planetData.features.radius;
+    const d = planetData.features.distance;
+    
+    if (r < 1.25) return 'rocky';
+    if (r < 2) return 'super-earth';
+    if (d > 5 || r < 4) return 'ice';
+    return 'gas';
+  }, [planetData]);
+  
+  // Crear textura del planeta
+  const planetTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d')!;
+    
+    const imageData = ctx.createImageData(512, 256);
+    const data = imageData.data;
+    
+    for (let y = 0; y < 256; y++) {
+      for (let x = 0; x < 512; x++) {
+        const index = (y * 512 + x) * 4;
+        const noise = (Math.sin(x * 0.02) + Math.sin(y * 0.02)) * 0.5 + 0.5;
         
         let r, g, b;
         
         switch (planetType) {
           case 'rocky':
-            // Earth-like with continents and oceans
-            if (noiseValue > 0.6) {
-              r = Math.floor((139 + noiseValue * 50) * detailNoise);
-              g = Math.floor((69 + noiseValue * 80) * detailNoise);
-              b = Math.floor((19 + noiseValue * 30) * detailNoise);
+            // Planeta rocoso tipo Tierra
+            if (noise > 0.6) {
+              // Continentes
+              r = Math.floor(139 + noise * 50);
+              g = Math.floor(69 + noise * 80);
+              b = Math.floor(19 + noise * 30);
             } else {
-              r = Math.floor((30 + noiseValue * 40) * detailNoise);
-              g = Math.floor((144 + noiseValue * 60) * detailNoise);
-              b = Math.floor((255 * (0.6 + noiseValue * 0.4)) * detailNoise);
+              // Océanos
+              r = Math.floor(30 + noise * 40);
+              g = Math.floor(144 + noise * 60);
+              b = Math.floor(255 * (0.6 + noise * 0.4));
             }
             break;
             
           case 'super-earth':
-            // Larger rocky world with more varied terrain
-            const elevation = noiseValue;
-            if (elevation > 0.7) {
-              // Mountains - grays and browns
-              r = Math.floor((120 + elevation * 80) * detailNoise);
-              g = Math.floor((100 + elevation * 60) * detailNoise);
-              b = Math.floor((80 + elevation * 40) * detailNoise);
-            } else if (elevation > 0.4) {
-              // Plains - greens and browns
-              r = Math.floor((100 + elevation * 60) * detailNoise);
-              g = Math.floor((120 + elevation * 80) * detailNoise);
-              b = Math.floor((60 + elevation * 40) * detailNoise);
-            } else {
-              // Lowlands/water - blues
-              r = Math.floor((40 + elevation * 60) * detailNoise);
-              g = Math.floor((80 + elevation * 100) * detailNoise);
-              b = Math.floor((200 + elevation * 55) * detailNoise);
-            }
+            // Super-Tierra con variaciones
+            r = Math.floor((100 + noise * 80));
+            g = Math.floor((150 + noise * 60));
+            b = Math.floor((80 + noise * 100));
             break;
             
           case 'gas':
-            // Jupiter-like with bands
-            const bandY = Math.sin(y * 0.02) * 0.5 + 0.5;
-            const bandPattern = Math.sin(y * 0.1 + x * 0.001) * 0.3 + 0.7;
-            
-            if (bandY > 0.7) {
-              r = Math.floor((255 * (0.9 + noiseValue * 0.1)) * bandPattern);
-              g = Math.floor((228 * (0.8 + noiseValue * 0.2)) * bandPattern);
-              b = Math.floor((181 * (0.7 + noiseValue * 0.3)) * bandPattern);
-            } else if (bandY > 0.3) {
-              r = Math.floor((222 * (0.8 + noiseValue * 0.2)) * bandPattern);
-              g = Math.floor((184 * (0.7 + noiseValue * 0.3)) * bandPattern);
-              b = Math.floor((135 * (0.6 + noiseValue * 0.4)) * bandPattern);
-            } else {
-              r = Math.floor((139 * (0.6 + noiseValue * 0.4)) * bandPattern);
-              g = Math.floor((69 * (0.5 + noiseValue * 0.5)) * bandPattern);
-              b = Math.floor((19 * (0.4 + noiseValue * 0.6)) * bandPattern);
-            }
+            // Gigante gaseoso con bandas
+            const band = Math.sin(y * 0.1) * 0.5 + 0.5;
+            r = Math.floor((255 * (0.8 + band * 0.2)));
+            g = Math.floor((200 * (0.7 + band * 0.3)));
+            b = Math.floor((150 * (0.6 + band * 0.4)));
             break;
             
           case 'ice':
-            // Europa-like ice world
-            const crackPattern = Math.abs(noise(x, y, 0.02)) > 0.3 ? 0.3 : 1.0;
-            r = Math.floor((224 + noiseValue * 31) * crackPattern * detailNoise);
-            g = Math.floor((255 * (0.9 + noiseValue * 0.1)) * crackPattern * detailNoise);
-            b = Math.floor((255 * (0.95 + noiseValue * 0.05)) * crackPattern * detailNoise);
+            // Mundo helado
+            r = Math.floor((200 + noise * 55));
+            g = Math.floor((230 + noise * 25));
+            b = Math.floor((255));
             break;
-            
-          default:
-            r = g = b = 128;
         }
         
-        // Apply exoplanet status tint
-        if (!isExoplanet) {
-          r = Math.floor(r * 0.8 + 50); // Add red tint for false positives
-          g = Math.floor(g * 0.6);
-          b = Math.floor(b * 0.6);
-        }
-        
-        data[index] = Math.min(255, Math.max(0, r));
-        data[index + 1] = Math.min(255, Math.max(0, g));
-        data[index + 2] = Math.min(255, Math.max(0, b));
+        data[index] = r;
+        data[index + 1] = g;
+        data[index + 2] = b;
         data[index + 3] = 255;
       }
     }
     
     ctx.putImageData(imageData, 0, 0);
-    
-    // Add surface features
-    if (planetType === 'rocky' || planetType === 'super-earth') {
-      // Add cloud patterns
-      ctx.globalCompositeOperation = 'overlay';
-      for (let i = 0; i < 15; i++) {
-        const x = Math.random() * 1024;
-        const y = Math.random() * 512;
-        const size = Math.random() * 80 + 40;
-        
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x - size, y - size, size * 2, size * 2);
-      }
-    }
-    
-    const planetTexture = new THREE.CanvasTexture(canvas);
-    
-    // Create normal map
-    const normalCanvas = document.createElement('canvas');
-    normalCanvas.width = 512;
-    normalCanvas.height = 256;
-    const normalCtx = normalCanvas.getContext('2d')!;
-    const normalImageData = normalCtx.createImageData(512, 256);
-    const normalData = normalImageData.data;
-    
-    for (let y = 0; y < 256; y++) {
-      for (let x = 0; x < 512; x++) {
-        const index = (y * 512 + x) * 4;
-        const height = noise(x, y, 0.02) * 0.5 + 0.5;
-        
-        normalData[index] = Math.floor((height * 0.5 + 0.5) * 255);
-        normalData[index + 1] = Math.floor((height * 0.5 + 0.5) * 255);
-        normalData[index + 2] = 255;
-        normalData[index + 3] = 255;
-      }
-    }
-    
-    normalCtx.putImageData(normalImageData, 0, 0);
-    const normalMap = new THREE.CanvasTexture(normalCanvas);
-    
-    // Create emissive map for gas giants
-    let emissiveMap = null;
-    if (planetType === 'gas') {
-      const emissiveCanvas = document.createElement('canvas');
-      emissiveCanvas.width = 512;
-      emissiveCanvas.height = 256;
-      const emissiveCtx = emissiveCanvas.getContext('2d')!;
-      
-      // Add storm systems
-      emissiveCtx.fillStyle = '#000000';
-      emissiveCtx.fillRect(0, 0, 512, 256);
-      
-      for (let i = 0; i < 8; i++) {
-        const x = Math.random() * 512;
-        const y = Math.random() * 256;
-        const size = Math.random() * 40 + 20;
-        
-        const gradient = emissiveCtx.createRadialGradient(x, y, 0, x, y, size);
-        gradient.addColorStop(0, isExoplanet ? '#22c55e' : '#ef4444');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        
-        emissiveCtx.fillStyle = gradient;
-        emissiveCtx.fillRect(x - size, y - size, size * 2, size * 2);
-      }
-      
-      emissiveMap = new THREE.CanvasTexture(emissiveCanvas);
-    }
-    
-    return { planetTexture, normalMap, emissiveMap };
-  }, [planetData, isExoplanet, planetType]);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    return texture;
+  }, [planetType]);
   
-  // Enhanced animation with interactive features
-  useFrame((state) => {
-    const time = state.clock.elapsedTime;
-    
+  useFrame(() => {
     if (meshRef.current) {
-      // Different rotation speeds based on planet type
-      const rotationSpeed = planetType === 'gas' ? 0.02 : 0.008;
-      meshRef.current.rotation.y += rotationSpeed;
-      
-      // Subtle wobble for realistic effect
-      meshRef.current.rotation.x = Math.sin(time * 0.3) * 0.05;
-      meshRef.current.rotation.z = Math.cos(time * 0.2) * 0.03;
-      
-      // Hover effect
-      if (isHovered) {
-        meshRef.current.scale.setScalar(1.1 + Math.sin(time * 2) * 0.05);
-      } else {
-        meshRef.current.scale.setScalar(1);
-      }
+      meshRef.current.rotation.y += 0.005;
     }
-    
     if (atmosphereRef.current) {
       atmosphereRef.current.rotation.y += 0.003;
-      atmosphereRef.current.rotation.x = Math.sin(time * 0.4) * 0.02;
-    }
-    
-    if (ringsRef.current) {
-      ringsRef.current.rotation.z += 0.001;
     }
   });
   
-  const handlePointerOver = () => setIsHovered(true);
-  const handlePointerOut = () => setIsHovered(false);
+  const getTypeDescription = () => {
+    switch (planetType) {
+      case 'rocky': return 'Planeta Rocoso';
+      case 'super-earth': return 'Super-Tierra';
+      case 'gas': return 'Gigante Gaseoso';
+      case 'ice': return 'Mundo Helado';
+      default: return 'Exoplaneta';
+    }
+  };
   
   return (
     <group>
-      {/* Main planet with enhanced materials */}
+      {/* Planeta principal */}
       <mesh
         ref={meshRef}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}
+        onPointerOver={() => setIsHovered(true)}
+        onPointerOut={() => setIsHovered(false)}
+        scale={isHovered ? 1.1 : 1}
       >
-        <sphereGeometry args={[radius, 128, 64]} />
+        <sphereGeometry args={[radius, 64, 32]} />
         <meshStandardMaterial
           map={planetTexture}
-          normalMap={normalMap}
-          normalScale={new THREE.Vector2(
-            planetType === 'rocky' || planetType === 'super-earth' ? 1.5 : 0.5,
-            planetType === 'rocky' || planetType === 'super-earth' ? 1.5 : 0.5
-          )}
-          emissiveMap={emissiveMap}
-          emissive={isExoplanet ? '#22c55e' : '#ef4444'}
-          emissiveIntensity={planetType === 'gas' ? 0.2 : 0.05}
-          roughness={planetType === 'ice' ? 0.1 : planetType === 'gas' ? 0.9 : 0.7}
-          metalness={planetType === 'rocky' || planetType === 'super-earth' ? 0.3 : 0.1}
-          envMapIntensity={planetType === 'ice' ? 1.5 : 0.8}
+          roughness={0.7}
+          metalness={0.1}
         />
       </mesh>
       
-      {/* Enhanced atmosphere for larger planets */}
-      {(planetType === 'gas' || planetType === 'super-earth') && (
-        <mesh ref={atmosphereRef}>
-          <sphereGeometry args={[radius * 1.08, 64, 32]} />
+      {/* Atmósfera (para planetas que la tengan) */}
+      {(planetType === 'rocky' || planetType === 'super-earth' || planetType === 'gas') && (
+        <mesh ref={atmosphereRef} scale={1.05}>
+          <sphereGeometry args={[radius, 32, 16]} />
           <meshBasicMaterial
-            color={planetType === 'gas' 
-              ? (isExoplanet ? '#FFE4B5' : '#FF6B6B') 
-              : (isExoplanet ? '#87CEEB' : '#FFA07A')
-            }
+            color={planetType === 'gas' ? '#FFA500' : '#87CEEB'}
             transparent
-            opacity={0.15}
+            opacity={0.2}
             side={THREE.BackSide}
-            depthWrite={false}
           />
         </mesh>
       )}
       
-      {/* Multi-layer glow effect */}
-      <mesh>
-        <sphereGeometry args={[radius * 1.15, 32, 16]} />
-        <meshBasicMaterial
-          color={isExoplanet ? '#22c55e' : '#ef4444'}
-          transparent
-          opacity={isHovered ? 0.2 : 0.08}
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
-      </mesh>
-      
-      <mesh>
-        <sphereGeometry args={[radius * 1.3, 16, 8]} />
-        <meshBasicMaterial
-          color={isExoplanet ? '#22c55e' : '#ef4444'}
-          transparent
-          opacity={isHovered ? 0.1 : 0.03}
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
-      </mesh>
-      
-      {/* Enhanced ring system for gas giants */}
-      {planetType === 'gas' && planetData.features.radius > 3 && (
-        <group ref={ringsRef}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[radius * 1.4, radius * 2.2, 128]} />
-            <meshBasicMaterial
-              color={isExoplanet ? '#D4AF37' : '#CD853F'}
-              transparent
-              opacity={0.6}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-          
-          {/* Inner ring */}
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[radius * 1.2, radius * 1.35, 64]} />
-            <meshBasicMaterial
-              color={isExoplanet ? '#F0E68C' : '#DEB887'}
-              transparent
-              opacity={0.4}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-        </group>
+      {/* Anillos para gigantes gaseosos */}
+      {planetType === 'gas' && (
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[radius * 1.5, radius * 2.2, 64]} />
+          <meshBasicMaterial
+            color="#D2691E"
+            transparent
+            opacity={0.6}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
       )}
       
-      {/* Interactive planet label */}
-      <Text
-        position={[0, radius + 1.2, 0]}
-        fontSize={isHovered ? 0.35 : 0.25}
-        color={isExoplanet ? '#22c55e' : '#ef4444'}
-        anchorX="center"
-        anchorY="middle"
-        font="/fonts/inter-bold.woff"
-      >
-        {planetData.name || planetData.id}
-      </Text>
-      
-      {/* Planet type indicator */}
-      <Text
-        position={[0, radius + 0.8, 0]}
-        fontSize={0.15}
-        color="#cccccc"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {planetType === 'rocky' && 'Rocky Planet'}
-        {planetType === 'super-earth' && 'Super-Earth'}
-        {planetType === 'gas' && 'Gas Giant'}
-        {planetType === 'ice' && 'Ice World'}
-      </Text>
-      
-      {/* Orbital path indicator */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[planetData.features.distance * 0.5, planetData.features.distance * 0.5 + 0.02, 64]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          transparent
-          opacity={isHovered ? 0.3 : 0.1}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
+      {/* Información del planeta */}
+      <Html position={[0, radius + 1.2, 0]} center>
+        <div className="bg-green-900/90 text-green-100 px-4 py-3 rounded-lg text-sm font-medium shadow-lg border border-green-700/50">
+          <div className="text-center">
+            <div className="font-bold text-green-300">✓ Exoplaneta Confirmado</div>
+            <div className="text-sm mt-1">{getTypeDescription()}</div>
+            <div className="text-xs mt-3 space-y-1 text-left">
+              <div><span className="font-semibold">Probabilidad:</span> {Math.round((planetData.probability || 0) * 100)}%</div>
+              <div><span className="font-semibold">Radio:</span> {planetData.features.radius.toFixed(1)} R⊕</div>
+              <div><span className="font-semibold">Período:</span> {planetData.features.period.toFixed(1)} días</div>
+              <div><span className="font-semibold">Distancia:</span> {planetData.features.distance.toFixed(1)} UA</div>
+            </div>
+          </div>
+        </div>
+      </Html>
     </group>
   );
 };
 
-// Enhanced star field component
-const EnhancedStarField = ({ isMobile }: { isMobile: boolean }) => {
-  const starsRef = useRef<THREE.Points>(null);
-  
-  useFrame((state) => {
-    if (starsRef.current) {
-      starsRef.current.rotation.y += 0.0002;
-      starsRef.current.rotation.x += 0.0001;
-    }
-  });
-  
-  return (
-    <group>
-      <Stars
-        ref={starsRef}
-        radius={150}
-        depth={80}
-        count={isMobile ? 800 : 1500}
-        factor={6}
-        saturation={0.2}
-        fade
-        speed={0.5}
-      />
-      
-      {/* Distant nebula effect */}
-      <mesh>
-        <sphereGeometry args={[200, 32, 16]} />
-        <meshBasicMaterial
-          color="#1a1a2e"
-          transparent
-          opacity={0.1}
-          side={THREE.BackSide}
-        />
-      </mesh>
-    </group>
-  );
-};
-
-const Scene = ({ planetData, isMobile }: { planetData: PlanetData; isMobile: boolean }) => {
-  const { camera } = useThree();
+// Componente principal de la escena
+const Scene = ({ planetData }: { planetData: PlanetData }) => {
   const isExoplanet = planetData.isExoplanet ?? (planetData.probability ?? 0) > 0.5;
   
   return (
     <>
-      {/* Enhanced lighting setup */}
-      <ambientLight intensity={0.2} color="#ffffff" />
+      {/* Iluminación */}
+      <ambientLight intensity={0.4} />
+      <pointLight position={[5, 5, 5]} intensity={1} color="#ffffff" />
+      <pointLight position={[-5, -5, -5]} intensity={0.3} color="#4169E1" />
       
-      {/* Main star light */}
-      <pointLight 
-        position={[8, 8, 8]} 
-        intensity={1.2} 
-        color="#FFF8DC"
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
+      {/* Campo de estrellas */}
+      <Stars radius={100} depth={50} count={2000} factor={4} fade />
       
-      {/* Secondary fill light */}
-      <pointLight 
-        position={[-6, -4, 6]} 
-        intensity={0.4} 
-        color={isExoplanet ? "#22c55e" : "#ef4444"}
-      />
+      {/* Objeto 3D según el tipo */}
+      {isExoplanet ? (
+        <ExoplanetObject planetData={planetData} />
+      ) : (
+        <AsteroidObject planetData={planetData} />
+      )}
       
-      {/* Rim light for dramatic effect */}
-      <pointLight 
-        position={[0, 0, -10]} 
-        intensity={0.3} 
-        color="#4f46e5"
-      />
-      
-      {/* Directional light for better planet illumination */}
-      <directionalLight
-        position={[5, 5, 5]}
-        intensity={0.5}
-        color="#ffffff"
-        castShadow
-      />
-      
-      <EnhancedStarField isMobile={isMobile} />
-      
-      <ProfessionalPlanet planetData={planetData} />
-      
+      {/* Controles */}
       <OrbitControls
-        enablePan={false}
         enableZoom={true}
+        enablePan={true}
         enableRotate={true}
         minDistance={2}
         maxDistance={15}
-        autoRotate
-        autoRotateSpeed={isMobile ? 0.2 : 0.3}
-        enableDamping
-        dampingFactor={0.08}
-        rotateSpeed={isMobile ? 0.4 : 0.6}
-        zoomSpeed={isMobile ? 0.5 : 1.2}
-        maxPolarAngle={Math.PI}
-        minPolarAngle={0}
+        autoRotate={false}
       />
     </>
   );
 };
 
 export const Professional3DVisualization = ({ planetData }: Professional3DVisualizationProps) => {
-  const isMobile = useIsMobile();
-  const isExoplanet = planetData.isExoplanet ?? (planetData.probability ?? 0) > 0.5;
-  const planetType = useMemo(() => getPlanetType(planetData), [planetData]);
-  const [showDetails, setShowDetails] = useState(false);
-  
-  // Calculate additional planet characteristics
-  const characteristics = useMemo(() => {
-    const radius = planetData.features.radius;
-    const period = planetData.features.period;
-    const distance = planetData.features.distance;
-    
-    // Estimate temperature based on distance (simplified)
-    const stellarTemp = 5778; // Sun-like star
-    const temperature = Math.round(stellarTemp * Math.sqrt(0.5 / distance));
-    
-    // Estimate mass based on radius and type
-    let mass;
-    if (planetType === 'rocky') {
-      mass = Math.pow(radius, 3.7); // Rocky planet mass-radius relation
-    } else if (planetType === 'super-earth') {
-      mass = Math.pow(radius, 2.8);
-    } else {
-      mass = Math.pow(radius, 1.8); // Gas giant relation
-    }
-    
-    // Habitability score
-    const habitabilityZone = distance >= 0.8 && distance <= 1.5;
-    const sizeScore = radius >= 0.5 && radius <= 2.0;
-    const habitability = (habitabilityZone && sizeScore && planetType !== 'gas') ? 'Potentially Habitable' : 'Not Habitable';
-    
-    return {
-      temperature,
-      mass: mass.toFixed(2),
-      habitability,
-      density: (mass / Math.pow(radius, 3)).toFixed(2)
-    };
-  }, [planetData, planetType]);
-  
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="h-full w-full relative"
-    >
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 60 }}
-        className="w-full h-full"
-        dpr={isMobile ? [1, 1.5] : [1, 2]}
-        performance={{ min: 0.5 }}
-        gl={{ 
-          antialias: !isMobile,
-          alpha: true,
-          powerPreference: isMobile ? "low-power" : "high-performance"
-        }}
-        shadows
-      >
-        <Scene planetData={planetData} isMobile={isMobile} />
+    <div className="w-full h-full relative">
+      <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+        <Scene planetData={planetData} />
       </Canvas>
       
-      {/* Enhanced status indicator */}
-      <motion.div 
-        className={`absolute ${isMobile ? 'top-2 right-2' : 'top-4 right-4'} z-10`}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <div className={`${isMobile ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'} rounded-full font-semibold backdrop-blur-md border ${
-          isExoplanet 
-            ? 'bg-green-500/20 text-green-400 border-green-500/30' 
-            : 'bg-red-500/20 text-red-400 border-red-500/30'
-        }`}>
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isExoplanet ? 'bg-green-400' : 'bg-red-400'}`} />
-            {isMobile 
-              ? (isExoplanet ? 'Exoplaneta' : 'Falso Positivo')
-              : (isExoplanet ? 'Exoplaneta Confirmado' : 'Falso Positivo')
-            }
-          </div>
+      {/* Controles de ayuda */}
+      <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg p-2 text-white text-xs">
+        <div className="space-y-1">
+          <div>🖱️ Clic y arrastra: Rotar</div>
+          <div>🔍 Scroll: Zoom</div>
+          <div>⚡ Clic derecho: Mover</div>
         </div>
-      </motion.div>
-      
-      {/* Controls hint */}
-      {!isMobile && (
-        <motion.div 
-          className="absolute top-4 left-4 z-10"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          <div className="glass-panel px-3 py-2 rounded-lg text-xs text-muted-foreground">
-            <div className="space-y-1">
-              <div>🖱️ Drag to rotate</div>
-              <div>🔍 Scroll to zoom</div>
-              <div>👆 Hover planet for details</div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-      
-      {/* Enhanced planet info overlay */}
-      <motion.div 
-        className={`absolute ${isMobile ? 'bottom-2 left-2 right-2' : 'bottom-4 left-4 right-4'} z-10`}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className={`glass-panel ${isMobile ? 'p-3' : 'p-4'} rounded-lg backdrop-blur-md border border-white/10`}>
-          <div className="flex items-center justify-between mb-3">
-            <h4 className={`font-bold ${isMobile ? 'text-sm' : 'text-base'} text-foreground`}>
-              {planetData.name || planetData.id}
-            </h4>
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-              className={`${isMobile ? 'text-xs px-2 py-1' : 'text-sm px-3 py-1'} bg-primary/20 hover:bg-primary/30 rounded-md transition-colors`}
-            >
-              {showDetails ? 'Less' : 'More'}
-            </button>
-          </div>
-          
-          <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-3'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
-            <div className="space-y-1">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Type:</span>
-                <span className="font-medium text-foreground">
-                  {planetType === 'rocky' && 'Rocky Planet'}
-                  {planetType === 'super-earth' && 'Super-Earth'}
-                  {planetType === 'gas' && 'Gas Giant'}
-                  {planetType === 'ice' && 'Ice World'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Radius:</span>
-                <span className="font-medium text-foreground">{planetData.features.radius.toFixed(2)} R⊕</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Period:</span>
-                <span className="font-medium text-foreground">{planetData.features.period.toFixed(1)} days</span>
-              </div>
-            </div>
-            
-            <div className="space-y-1">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Distance:</span>
-                <span className="font-medium text-foreground">{planetData.features.distance.toFixed(2)} AU</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Probability:</span>
-                <span className={`font-medium ${isExoplanet ? 'text-green-400' : 'text-red-400'}`}>
-                  {((planetData.probability ?? 0.5) * 100).toFixed(1)}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Est. Mass:</span>
-                <span className="font-medium text-foreground">{characteristics.mass} M⊕</span>
-              </div>
-            </div>
-          </div>
-          
-          <AnimatePresence>
-            {showDetails && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-3 pt-3 border-t border-white/10"
-              >
-                <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-3'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Est. Temperature:</span>
-                      <span className="font-medium text-foreground">{characteristics.temperature}K</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Density:</span>
-                      <span className="font-medium text-foreground">{characteristics.density} g/cm³</span>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Habitability:</span>
-                      <span className={`font-medium text-xs ${
-                        characteristics.habitability === 'Potentially Habitable' ? 'text-green-400' : 'text-orange-400'
-                      }`}>
-                        {characteristics.habitability}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Discovery Method:</span>
-                      <span className="font-medium text-foreground">Transit</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };

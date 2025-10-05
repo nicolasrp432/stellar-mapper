@@ -135,6 +135,65 @@ export const ProfessionalView = ({ endpoint = '/analyze' }: { endpoint?: string 
                 </div>
               </div>
 
+              {/* Results Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {displayPlanets.slice(0, 6).map((planet, index) => {
+                  const isExoplanet = planet.isExoplanet ?? (planet.probability ?? 0) > 0.5;
+                  return (
+                    <motion.div
+                      key={planet.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`p-4 rounded-lg border shadow-sm cursor-pointer transition-all hover:shadow-md ${
+                        isExoplanet 
+                          ? "bg-green-900/20 border-green-400/30 hover:bg-green-900/30" 
+                          : "bg-red-900/20 border-red-400/30 hover:bg-red-900/30"
+                      }`}
+                      onClick={() => setSelectedPlanet(planet)}
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-semibold text-white text-sm">
+                          {planet.name || `Candidato ${index + 1}`}
+                        </h4>
+                        {isExoplanet ? (
+                          <CheckCircle className="h-5 w-5 text-green-400" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-400" />
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-300">Probabilidad</span>
+                          <span className={`text-sm font-bold ${isExoplanet ? 'text-green-400' : 'text-red-400'}`}>
+                            {Math.round((planet.probability ?? 0.5) * 100)}%
+                          </span>
+                        </div>
+                        
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              isExoplanet ? 'bg-green-400' : 'bg-red-400'
+                            }`}
+                            style={{ width: `${(planet.probability ?? 0.5) * 100}%` }}
+                          />
+                        </div>
+                        
+                        <div className="text-xs text-gray-400 mt-2">
+                          <div>Radio: {planet.features.radius.toFixed(1)} R⊕</div>
+                          <div>Período: {planet.features.period.toFixed(1)} días</div>
+                        </div>
+                        
+                        <div className={`text-xs font-medium mt-2 ${isExoplanet ? 'text-green-400' : 'text-red-400'}`}>
+                          {isExoplanet ? "✓ Exoplaneta" : "✗ Falso positivo"}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
               {/* Table */}
               <div className="glass-panel rounded-lg overflow-hidden">
                 <div className={`${isMobile ? 'overflow-x-auto' : ''}`}>
