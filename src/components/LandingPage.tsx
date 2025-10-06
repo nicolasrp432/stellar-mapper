@@ -70,7 +70,7 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
           className={`${isMobile ? 'mb-4' : 'mb-6'}`}
         >
           <h1 className={`${isMobile ? 'text-4xl' : 'text-6xl md:text-7xl'} font-bold text-white mb-2 drop-shadow-[0_0_20px_rgba(0,0,0,0.8)] [text-shadow:_2px_2px_4px_rgb(0_0_0_/_80%)]`}>
-            Exo
+            Exo {' '}
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
