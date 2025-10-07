@@ -75,13 +75,10 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8, duration: 1 }}
-              className="text-cyan-400 font-bold relative"
+              className="font-bold"
               style={{
-                textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(147, 51, 234, 0.6)',
-                background: 'linear-gradient(45deg, #67e8f9, #60a5fa, #c084fc)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: '#60a5fa' // Strong fallback color
+                color: '#60a5fa',
+                textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(147, 51, 234, 0.6)'
               }}
             >
               Vision
