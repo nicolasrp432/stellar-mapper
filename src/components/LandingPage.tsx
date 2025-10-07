@@ -75,9 +75,17 @@ export const LandingPage = ({ onSelectMode }: LandingPageProps) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8, duration: 1 }}
-              className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+              className="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text"
               style={{
-                filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 20px rgba(147, 51, 234, 0.4))'
+                color: '#60a5fa', // Fallback color (blue-400)
+                textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(147, 51, 234, 0.6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                // Ensure text is visible if gradient fails
+                background: 'linear-gradient(to right, #67e8f9, #60a5fa, #c084fc)',
+                backgroundSize: '100%',
+                backgroundRepeat: 'repeat'
               }}
             >
               Vision
